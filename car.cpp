@@ -3,7 +3,7 @@
 Car::Car() {}
 
 CarState& Car::GetCarState() {
-    return car_state_;
+  return car_state_;
 }
 /*
 _____________________________________________________________________________*/

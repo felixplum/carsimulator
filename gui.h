@@ -28,14 +28,22 @@ private slots:
   void on_pushButton_plot_clicked();
   void GuiTimerUpdate();
 
+  void on_pushButton_reset_clicked();
+
 private:
+    void SetStatus(RunState status);
+    void DrawSimulation();
+    //
     Ui::GUI *ui;
     PlotWindow *plot_window_;
     QCustomPlot * custom_plot_;
+    QTimer* gui_timer_;
+    QGraphicsScene *scene_;
+    //
     bool simulation_started_;
     Simulator sim_;
     StateMemory state_memory_;
-    QTimer* gui_timer_;
+    const float DT_RECORDING_;
 };
 
 #endif // GUI_H

@@ -69,6 +69,14 @@ void Simulator::ChangeRunStatus(RunState new_state) {
     default: std::cerr << "ChangeRunStatus: Default case.." << std::endl;
   }
 }
+/* Reset
+_____________________________________________________________________________*/
+void Simulator::ResetState() {
+  ChangeRunStatus(RS_STOPPED);
+  for (auto& car_it : simulated_cars_) {
+      car_it->GetCarState().ResetState();
+  }
+}
 // SetSampleTime()
 
 // attachInputTimeSeriesToCar

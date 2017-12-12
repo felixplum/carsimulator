@@ -21,20 +21,15 @@ struct Record {
   int state_size_;
   int state_count_;
   std::vector<float> time_vec_;
-  RecordType record_type_;
   // stores state vecs. sequentially for faster access
   std::vector<float> state_storage_;
   boost::mutex rw_lock_;
  public:
+  RecordType record_type_;
   Record(int state_size, RecordType record_type){
     record_type_ = record_type;
     state_size_ = state_size;
-    state_count_ = 0;
-    // allocate memory for 1min@10Hz storage
-    state_storage_.reserve(state_size_*10*60);
-    time_vec_.reserve(state_size_*10*60);
-    //  std::cout << "Added new record with state_storage size " <<
-    //  state_storage_.size() << std::endl;
+    Reset();
   }
   void AddState(const std::vector<float>& state_vec, float time) {
     boost::mutex::scoped_lock(rw_lock_);
@@ -50,20 +45,29 @@ struct Record {
   }
   bool ReadStateAtIdx(std::vector<float>* state_vec_return,
                       float* time_return, int state_idx) const {
-    //std::cout << "entering" <<std::endl;
+    //std::cout << "ReadStateAtIdx " << state_idx<<std::endl;
     boost::mutex::scoped_lock(rw_lock_);
     if (state_size_ == 0 || state_idx > state_count_-1) {return false;}
     std::vector<float> ret_vec(
           state_storage_.begin()+state_idx*state_size_,
           state_storage_.begin()+state_idx*state_size_+state_size_-1);
+    std::cout << "read range " << state_idx*state_size_ << " to " << state_idx*state_size_+state_size_-1 << std::endl;
     *state_vec_return = std::move(ret_vec);
-    *time_return = time_vec_.back();
-    std::cout << "Record, return t = " <<*time_return<< std::endl;
-    std::cout << "Record, return x = " <<(*state_vec_return)[0]<< std::endl;
+    *time_return = time_vec_[state_idx];
+//    std::cout << "Record, return t = " <<*time_return <<
+//                 " return x = " <<(*state_vec_return)[0]<< std::endl;
     return true;
   }
   int GetStateCount() const {
     return state_count_;
+  }
+  void Reset() {
+    state_count_ = 0;
+    // allocate memory for 1min@10Hz storage
+    state_storage_.clear();
+    time_vec_.clear();
+    state_storage_.reserve(state_size_*10*60);
+    time_vec_.reserve(state_size_*10*60);
   }
   void PrintState() {
     std::cout << "State size: " << state_size_ << " State count: " <<
@@ -83,8 +87,9 @@ class StateMemory : QWidget {
 //  void SetCallback(std::function<void()> callback);
   void AddReadRecord(CarPtr car, const std::string& file_name);
   void AddWriteRecord(CarPtr car);
-  void ToggleRecording(bool activate_recording, float dt_sample);
+  void ToggleRecording(bool activate_recording, float dt_sample = 0.1);
   std::vector<RecordPtr> GetRecordPtrVec() const;
+  void ResetState();
 
  private:
   // main thread loop

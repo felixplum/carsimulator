@@ -13,6 +13,9 @@
 11.12:
   Testing of data recorder, validation by plotting; fixed minor bugs
   Put plot window in own class, tried to figure out how to replot data (HOW???)
+12.12: 
+  Implemented QTimer + Signal/Slot mechanism
+    [] time and state seem to diverge!?
 
 Next steps: 
 

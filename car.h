@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <cassert>
+#include <boost/thread/mutex.hpp>
 //#include <string>
 
 /* CarState encapsulates the state vector and provides methods for access.
@@ -19,17 +20,30 @@ class CarState {
   std::vector<float> input_values_;
   std::vector<std::string> state_names_;
   float current_time_;
+  bool is_init_ = false;
+  boost::mutex rw_mutex_;
 
   public:
     /** Public interface **/
     void InitState(std::vector<float> state_values_init,
                    std::vector<float> input_values_init,
                    std::vector<std::string> state_names) {
+      boost::mutex::scoped_lock(rw_mutex_);
       state_values_ = state_values_init;
       input_values_ = input_values_init;
       state_names_ = state_names;
       current_time_ = 0.;
+      is_init_ = true;
       assert(state_values_init.size() == state_names.size());
+    }
+    void ResetState() {
+      boost::mutex::scoped_lock(rw_mutex_);
+      if (!is_init_) {
+        std::cerr << "Cannot reset car state; state not init." << std::endl;
+      }
+      state_values_ = std::vector<float>(state_values_.size(), 0.);
+      input_values_ = std::vector<float>(input_values_.size(), 0.);
+      current_time_ = 0.;
     }
     // returns reference to state
     const std::vector<float>& GetStateVector() const {
@@ -42,10 +56,12 @@ class CarState {
       return input_values_;
     }
     void UpdateStateVector(const std::vector<float>& new_state, float dt) {
+      boost::mutex::scoped_lock(rw_mutex_);
       state_values_ = new_state;
       current_time_ += dt;
     }
     void UpdateInputVector(const std::vector<float>& new_input) {
+      boost::mutex::scoped_lock(rw_mutex_);
       input_values_ = new_input;
     }
 
@@ -66,6 +82,7 @@ class CarState {
   // print operator for debugging
   friend std::ostream& operator<<(std::ostream& os,
                                   const CarState& car_state) {
+    boost::mutex::scoped_lock(rw_mutex_);
     for (size_t i = 0; i < car_state.state_values_.size(); ++i) {
       os << car_state.state_names_[i] << ": " << car_state.state_values_[i]
       << std::endl;

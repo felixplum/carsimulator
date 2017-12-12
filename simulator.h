@@ -27,6 +27,7 @@ class Simulator {
    void UpdateCars();
    // called when pressing Start/Resume
    void ChangeRunStatus(RunState new_state);
+   void ResetState();
  private:
    // all cars to be simulated stored here
    void Run();

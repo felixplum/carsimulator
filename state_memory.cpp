@@ -11,17 +11,20 @@ StateMemory::StateMemory() {
 _____________________________________________________________________________*/
 void StateMemory::RunRecording() {
   while (is_recording_) {
+    // stop simulation, synch? callback/signal
     boost::this_thread::sleep_for(
           boost::chrono::milliseconds(static_cast<int>(dt_sample_*1e3)));
-    //std::cout << "This thread is recording lolol" << std::endl;
     for (size_t i = 0; i < car_vec_.size(); ++i) {
+      if (records_vec_[i]->record_type_ == Record::RecordType::RT_READ_FROM) {
+          continue;
+      }
       records_vec_[i]->AddState(car_vec_[i]->GetCarState().GetStateVector(),
                                 car_vec_[i]->GetCarState().GetTime());
     }
   }
-  std::cout << "recording stopped" << std::endl;
+  std::cout << "Recording stopped" << std::endl;
 }
-/*
+/* Adds a record which is preloaded from file
 _____________________________________________________________________________*/
 void StateMemory::AddReadRecord(CarPtr car, const std::string& file_name) {
   std::cerr << "READFROM FILE method still missing!!" << std::endl;
@@ -51,10 +54,20 @@ void StateMemory::ToggleRecording(bool activate_recording, float dt_sample) {
   }
 }
 
+/*
+_____________________________________________________________________________*/
 std::vector<RecordPtr> StateMemory::GetRecordPtrVec() const {
   return records_vec_;
 }
 
+/* Delete records, but keep number of records const.
+_____________________________________________________________________________*/
+void StateMemory::ResetState() {
+  ToggleRecording(false);
+  for (size_t i = 0; i < car_vec_.size(); ++i) {
+    records_vec_[i]->Reset();
+  }
+}
 
 /*
 _____________________________________________________________________________*/
