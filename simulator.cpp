@@ -1,7 +1,7 @@
 #include "simulator.h"
 
-Simulator::Simulator() :
-  dt_sample_(0.1),
+Simulator::Simulator(float dt_sample) :
+  dt_sample_(dt_sample),
   simulation_run_state_(RS_STOPPED) {
 }
 

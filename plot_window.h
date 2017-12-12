@@ -15,7 +15,7 @@ class PlotWindow : public QWidget
 public:
   explicit PlotWindow(QWidget *parent = nullptr);
   void Plot();
-  void StartPlotting(std::vector<RecordPtr> record_vec);
+  void InitPlot(std::vector<RecordPtr> record_vec);
 
 signals:
 
@@ -25,7 +25,6 @@ private:
   QCustomPlot* custom_plot_;
   QGridLayout *layout_;
   std::vector<RecordPtr> record_vec_;
-  virtual void paintEvent(QPaintEvent * event);
 };
 
 #endif // PLOT_WINDOW_H

@@ -7,6 +7,7 @@
 #include "state_memory.h"
 #include "car_model_bicycle.h"
 #include <memory>
+#include <QTimer>
 
 namespace Ui {
 class GUI;
@@ -25,6 +26,7 @@ private slots:
   void on_pushButton_startpause_clicked();
 
   void on_pushButton_plot_clicked();
+  void GuiTimerUpdate();
 
 private:
     Ui::GUI *ui;
@@ -33,6 +35,7 @@ private:
     bool simulation_started_;
     Simulator sim_;
     StateMemory state_memory_;
+    QTimer* gui_timer_;
 };
 
 #endif // GUI_H

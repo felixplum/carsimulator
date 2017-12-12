@@ -14,10 +14,8 @@ PlotWindow::PlotWindow(QWidget *parent) : QWidget(parent) {
 }
 
 
-void PlotWindow::StartPlotting(std::vector<RecordPtr> record_vec) {
+void PlotWindow::InitPlot(std::vector<RecordPtr> record_vec) {
   record_vec_ = record_vec;
-//  boost::thread t(&PlotWindow::Run, this);
-  Plot();
 }
 void PlotWindow::Plot() {
 
@@ -25,6 +23,7 @@ void PlotWindow::Plot() {
   float time_return;
   if (record_vec_.empty()) return;
   int no_states = record_vec_[0]->GetStateCount();
+  //std::cout << "no states is " << no_states << std::endl;
   QVector<double> xx;
   QVector<double> yy;
   QVector<double> time_vec;
@@ -34,24 +33,17 @@ void PlotWindow::Plot() {
     xx.push_back(state_vec_return[0]);
     yy.push_back(state_vec_return[1]);
     time_vec.push_back(time_return);
+    //std::cout << "x: " << xx.back() << " t: " << time_vec.back() << std::endl;
     if (fabs(xx.back()) > max_val) max_val = fabs(xx.back());
     if (fabs(yy.back()) > max_val) max_val = fabs(yy.back());
   }
-//  record_vec[0]->ReadLastState(&state_vec_return, &time_return);
-//  printf("last x|y|phi|t: %f %f %f %f", state_vec_return[0], state_vec_return[1],
-//                                        state_vec_return[2], time_return);
 
-//  std::vector<double> x(100);
-//  std::vector<double> y(x.size());
-//  for (size_t i = 0; i < x.size(); ++i) {
-//    x[i] = i*0.01;
-//    y[i] = x[i]*x[i];
-//  }
-//  QVector<double> xx = QVector<double>::fromStdVector(x);
-//  QVector<double> yy = QVector<double>::fromStdVector(y);
-  custom_plot_->graph(0)->setData(xx,yy, true);
-  custom_plot_->xAxis->setRange(-max_val, max_val);
+  custom_plot_->graph(0)->setData(xx,time_vec, true);
+  custom_plot_->xAxis->setRange(0, time_vec.back());
   custom_plot_->yAxis->setRange(-max_val, max_val);
+//  custom_plot_->graph(0)->setPen(QPen(QColor(255, 100, 0)));
+//  custom_plot_->graph(0)->setLineStyle(QCPGraph::lsLine);
+//  custom_plot_->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 5));
   custom_plot_->replot();
   //custom_plot_->show();
 }

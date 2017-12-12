@@ -21,7 +21,7 @@ typedef std::shared_ptr<Car> CarPtr;
 
 class Simulator {
  public:
-   Simulator();
+   Simulator(float dt_sample);
    // to be called from GUI
    CarPtr AddNewCar(CAR_TYPE car_model_type = CT_BICYCLE);
    void UpdateCars();
