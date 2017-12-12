@@ -35,6 +35,9 @@ class CarState {
     const std::vector<float>& GetStateVector() const {
       return state_values_;
     }
+    float GetTime() const {
+      return current_time_;
+    }
     const std::vector<float>& GetInputVector() const {
       return input_values_;
     }

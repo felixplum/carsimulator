@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = CarLabSimulator
 TEMPLATE = app
@@ -33,7 +33,9 @@ SOURCES += \
     car_model_bicycle.cpp \
     map.cpp \
     simulator.cpp \
-    state_memory.cpp
+    state_memory.cpp \
+    ../../Libs/qcustomplot/qcustomplot.cpp \
+    plot_window.cpp
 
 HEADERS += \
         gui.h \
@@ -42,7 +44,9 @@ HEADERS += \
     car_model_bicycle.h \
     map.h \
     simulator.h \
-    state_memory.h
+    state_memory.h \
+    ../../Libs/qcustomplot/qcustomplot.h \
+    plot_window.h
 
 FORMS += \
         gui.ui

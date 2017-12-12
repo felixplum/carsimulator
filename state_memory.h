@@ -10,7 +10,8 @@
 #include <memory> // for smart ptr
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/chrono.hpp>
+#include <boost/chrono.hpp> // for time measurement
+#include <functional> // for callback fct. def.
 /* This class provides methods for storing and accessing states
    #Usage:
     - Passing ptr to car,  */
@@ -30,14 +31,22 @@ struct Record {
   Record(int state_size, RecordType record_type){
     record_type_ = record_type;
     state_size_ = state_size;
+    state_count_ = 0;
     // allocate memory for 1min@10Hz storage
     state_storage_.reserve(state_size_*10*60);
     time_vec_.reserve(state_size_*10*60);
+    //  std::cout << "Added new record with state_storage size " <<
+    //  state_storage_.size() << std::endl;
   }
   void AddState(const std::vector<float>& state_vec, float time) {
+//    std::cout << "Add state, current storage size: " << state_storage_.size()
+//    << std::endl;
+//    std::cout << "Add state, new state size: " << state_vec.size() <<
+//    std::endl;
     state_storage_.insert(state_storage_.end(), state_vec.begin(),
                           state_vec.end());
     time_vec_.push_back(time);
+    state_count_++;
   }
   bool ReadLastState(std::vector<float>* state_vec_return,
                      float* time_return) const {
@@ -54,18 +63,29 @@ struct Record {
     *time_return = time_vec_.back();
     return true;
   }
+  int GetStateCount() const {
+    return state_count_;
+  }
+  void PrintState() {
+    std::cout << "State size: " << state_size_ << " State count: " <<
+                 state_count_ << std::endl;
+    std::cout << "Size of state storage: " << state_storage_.size() <<
+                 std::endl;
+  }
 };
 
-typedef std::unique_ptr<Record> RecordPtr;
+typedef std::shared_ptr<Record> RecordPtr;
 
 /* Main declaration
 ___________________________________________________________________*/
 class StateMemory {
  public:
   StateMemory();
+//  void SetCallback(std::function<void()> callback);
   void AddReadRecord(CarPtr car, const std::string& file_name);
   void AddWriteRecord(CarPtr car);
   void ToggleRecording(bool activate_recording, float dt_sample);
+  std::vector<RecordPtr> GetRecordPtrVec() const;
 
  private:
   // main thread loop

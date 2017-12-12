@@ -21,9 +21,9 @@ typedef std::shared_ptr<Car> CarPtr;
 
 class Simulator {
  public:
-   Simulator(float dt);
+   Simulator();
    // to be called from GUI
-   void AddNewCar(CAR_TYPE car_model_type = CT_BICYCLE);
+   CarPtr AddNewCar(CAR_TYPE car_model_type = CT_BICYCLE);
    void UpdateCars();
    // called when pressing Start/Resume
    void ChangeRunStatus(RunState new_state);
@@ -32,7 +32,7 @@ class Simulator {
    void Run();
    std::vector<CarPtr> simulated_cars_;
    std::vector<std::vector<CarState>> state_histories_; // make own class
-   float SAMPLE_TIME_;
+   float dt_sample_;
    RunState simulation_run_state_;
    boost::mutex simulation_state_mutex_;
 };

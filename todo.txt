@@ -1,0 +1,35 @@
+20.11 - 6.12: 
+  Reading on Qt, deciding on architecture, general setup
+  Added classes Car and CarModelBicyle
+  Basic tests
+7.12: 
+  Added class Simulator for handling of simulation objects
+  Added class StateMemory for data logging
+  Reading on threads; added threads for classes above
+  Testing of rk4 integration of car model: Results look reasonable!
+8.12:   
+  Added button to start/pause + reset simulation
+  Added plotting window + test plot
+11.12:
+  Testing of data recorder, validation by plotting; fixed minor bugs
+  Put plot window in own class, tried to figure out how to replot data (HOW???)
+
+Next steps: 
+
+  []Add drawing routine (rectangle)
+  []Add draw from StateMemory
+  []ReadFromFile (get log output on RCL computer first)
+  []Display Gridmap
+  []Get coordinate systems right
+  []Sample from local map
+  []Add controller to car_bicyle_model
+  []Add path generator
+  []Pass map object to car
+
+
+____-
+
+
+) QT_GRAPHICSSYSTEM=xxxx. I tried the various 'native', 'raster', 'opengl' settings. On Linux the 'raster' was the best performer. The CPU utilization dropped to about 15% in my test. On windows 'opengl' just caused a blank window screen to appear.... 'raster' was the fastest.
+
+https://mayaposch.wordpress.com/2011/11/01/how-to-really-truly-use-qthreads-the-full-explanation/
