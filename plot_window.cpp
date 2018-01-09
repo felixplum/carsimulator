@@ -8,6 +8,8 @@ PlotWindow::PlotWindow(QWidget *parent) : QWidget(parent) {
   //plot_window_->setLayout(layout);
   custom_plot_->addGraph();
   custom_plot_->graph(0)->setLineStyle(QCPGraph::lsLine);
+  custom_plot_->addGraph();
+  custom_plot_->graph(1)->setLineStyle(QCPGraph::lsLine);
   this->move(300, 300);
   this->resize(200, 200);
   record_vec_.resize(0);
@@ -41,6 +43,7 @@ void PlotWindow::Plot() {
   }
 
   custom_plot_->graph(0)->setData(time_vec, xx, true);
+  custom_plot_->graph(1)->setData(time_vec, yy, true);
   custom_plot_->xAxis->setRange(0, time_vec.back());
   custom_plot_->yAxis->setRange(-max_val, max_val);
 //  custom_plot_->graph(0)->setPen(QPen(QColor(255, 100, 0)));

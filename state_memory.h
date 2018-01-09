@@ -50,8 +50,9 @@ struct Record {
     if (state_size_ == 0 || state_idx > state_count_-1) {return false;}
     std::vector<float> ret_vec(
           state_storage_.begin()+state_idx*state_size_,
-          state_storage_.begin()+state_idx*state_size_+state_size_-1);
-    std::cout << "read range " << state_idx*state_size_ << " to " << state_idx*state_size_+state_size_-1 << std::endl;
+          state_storage_.begin()+state_idx*state_size_+state_size_); // todo: why not -1?
+//    std::cout << "read range " << state_idx*state_size_ << " to " << state_idx*state_size_+state_size_-1 << std::endl;
+//    std::cout << "phi rad, ri = " << ret_vec[2] << std::endl;
     *state_vec_return = std::move(ret_vec);
     *time_return = time_vec_[state_idx];
 //    std::cout << "Record, return t = " <<*time_return <<

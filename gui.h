@@ -8,6 +8,7 @@
 #include "car_model_bicycle.h"
 #include <memory>
 #include <QTimer>
+#include "customtypes.h"
 
 namespace Ui {
 class GUI;
@@ -20,6 +21,7 @@ class GUI : public QMainWindow
 public:
     explicit GUI(QWidget *parent = 0);
     ~GUI();
+//    void closeEvent(QCloseEvent *bar);
 
 private slots:
 
@@ -33,12 +35,15 @@ private slots:
 private:
     void SetStatus(RunState status);
     void DrawSimulation();
+    void TransformCarToViewCoord(Pose* car_pose) const;
     //
     Ui::GUI *ui;
     PlotWindow *plot_window_;
     QCustomPlot * custom_plot_;
     QTimer* gui_timer_;
     QGraphicsScene *scene_;
+    std::vector<QGraphicsRectItem*> car_rect_vec_;
+    float pixel_per_meter_;
     //
     bool simulation_started_;
     Simulator sim_;

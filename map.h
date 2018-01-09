@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include "customtypes.h"
 
 /* -----------> y (cols)
    |
@@ -14,20 +15,6 @@
    |
    x (rows) */
 
-struct Pose {
-  public:
-    Pose(float x_in, float y_in, float phi_in) : x(x_in), y(y_in), phi(phi_in) {};
-    float x;
-    float y;
-    float phi;
-};
-
-struct Point {
-  public:
-    Point(float x_in, float y_in) : x(x_in), y(y_in) {};
-    float x;
-    float y;
-};
 
 class Map {
   public:
