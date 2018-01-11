@@ -9,6 +9,7 @@
 #include <memory>
 #include <QTimer>
 #include "customtypes.h"
+#include "map.h"
 
 namespace Ui {
 class GUI;
@@ -42,11 +43,14 @@ private:
     QCustomPlot * custom_plot_;
     QTimer* gui_timer_;
     QGraphicsScene *scene_;
+    QGraphicsScene *scene_egoview_;
+    QImage *image_pov_;
     std::vector<QGraphicsRectItem*> car_rect_vec_;
     float pixel_per_meter_;
     //
     bool simulation_started_;
     Simulator sim_;
+    Map map_;
     StateMemory state_memory_;
     const float DT_RECORDING_;
 };

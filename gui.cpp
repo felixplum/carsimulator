@@ -19,15 +19,26 @@ GUI::GUI(QWidget *parent) :
 
     // experimental:
     QPixmap background_img;
-    if(!background_img.load("grid.bmp"))
+    if(!background_img.load("grid.bmp")) {
       std::cerr << "Couldn't load background grid" << std::endl;
-    printf("bmp dim is %i %i \n", background_img.width(),background_img.height());
+      return;
+    }
+    map_.LoadFromPixmap(background_img);
     QPixmap background_img_scaled = background_img.scaledToWidth(550);
     ui->graphicsView->resize(background_img_scaled.width(), background_img_scaled.height());
     scene_->setBackgroundBrush(QBrush(background_img_scaled));
     ui->graphicsView->setCacheMode(QGraphicsView::CacheBackground);
     ui->graphicsView->setSceneRect(0, 0, ui->graphicsView->width(), ui->graphicsView->height());
     ui->graphicsView->setFrameShape(QGraphicsView::NoFrame);
+    // Graphicsview for ego-perspective of car
+    int egoview_width = 200;
+    int egoview_height= 200;
+    ui->graphicsView_2->resize(egoview_width, egoview_height);
+    scene_egoview_ = new QGraphicsScene(this);
+    ui->graphicsView_2->setScene(scene_egoview_);
+    image_pov_ = new QImage(egoview_width, egoview_height, QImage::Format_Mono);
+    ui->graphicsView_2->setSceneRect(0, 0, ui->graphicsView_2->width(), ui->graphicsView_2->height());
+    ui->graphicsView_2->setFrameShape(QGraphicsView::NoFrame);
   }
 
 GUI::~GUI() {
@@ -94,7 +105,7 @@ _________________________________________________________________________*/
 void GUI::TransformCarToViewCoord(Pose* car_pose) const {
   /* QT coord: x pointing right, y to the bottom; origin top left corner */
   car_pose->y = ui->graphicsView->height()-(car_pose->y)*pixel_per_meter_;
-  car_pose->x = (car_pose->x+1.)*pixel_per_meter_;
+  car_pose->x = (car_pose->x)*pixel_per_meter_;
   car_pose->phi *= -1.;
 }
 /*
@@ -116,16 +127,25 @@ void GUI::DrawSimulation() {
    }
 //  Pose car_pose(state_vec[0], state_vec[1], state_vec[2]);
   Pose car_pose(state_vec[0], state_vec[1], state_vec[2]);
-  TransformCarToViewCoord(&car_pose);
+  car_pose.x += 1.05; // todo: remove, on;y to avoid neg. vals
+  Pose car_pose_pixel = car_pose;
+//  int val = map_.GetGridValueAtMetricPoint(Point(car_pose.x, car_pose.y));
+//  std::cout << val << std::endl;
+  TransformCarToViewCoord(&car_pose_pixel);
   float car_width_view = pixel_per_meter_ * (CONSTANTS::CAR_WIDTH_METER);
   float car_length_view = pixel_per_meter_* (CONSTANTS::CAR_LENGTH_METER);
-  car_rect_vec_[0]->setRect(car_pose.x, car_pose.y-0.5*car_width_view,
+  car_rect_vec_[0]->setRect(car_pose_pixel.x, car_pose_pixel.y-0.5*car_width_view,
                             car_length_view, car_width_view);
 //  car_rect_vec_[0]->setRect(0, car_pose.y,
 //                            car_length_view, car_width_view);
   car_rect_vec_[0]->setTransformOriginPoint(car_rect_vec_[0]->boundingRect().center());
-  car_rect_vec_[0]->setRotation((CONSTANTS::RAD2DEG)*car_pose.phi);
+  car_rect_vec_[0]->setRotation((CONSTANTS::RAD2DEG)*car_pose_pixel.phi);
 //  car_rect_vec_[0]->setRotation(());
+
+  // Draw POV of car
+  map_.GetLocalGrid(car_pose, image_pov_);
+  scene_egoview_->addPixmap(QPixmap::fromImage(*image_pov_));
+//  scene_egoview_->setSceneRect(image_pov.rect());
 }
 
 

@@ -19,7 +19,7 @@ struct Point {
 namespace CONSTANTS {
   const float RAD2DEG = 57.2957795131;
   const float X_MAX_METER = 3.;
-  const float Y_MAX_METER = 3.;
+  const float Y_MAX_METER = 2.;
   const float CAR_WIDTH_METER = 0.05;
   const float CAR_LENGTH_METER = 0.1;
 }
