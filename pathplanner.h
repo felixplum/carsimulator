@@ -12,8 +12,9 @@ class PathPlanner
 public:
   PathPlanner();
   bool GetWaypoints(QImage* grid_local,
-                    float pixel_per_m,
-                    std::vector<Point>* waypoint_vec_local);
+                    std::vector<Point>* waypoint_vec_local_pixel,
+                    std::vector<Point>* waypoint_vec_local_meter = NULL,
+                    float* pixel_per_m = NULL);
 private:
 };
 

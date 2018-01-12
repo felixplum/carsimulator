@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cassert>
 #include <boost/thread/mutex.hpp>
+#include "customtypes.h"
 //#include <string>
 
 /* CarState encapsulates the state vector and provides methods for access.
@@ -105,10 +106,14 @@ class Car {
     void UpdateState(const std::vector<float>& control_input_vec,
                      float dt);
   protected:
+    /* Methods that need to be overwritten by specific car
+       implementation: */
     // Returns xdot = f(x, u); must be overriden by specific car model
     virtual void EvaluateModel(const std::vector<float>& state_vec,
                                const std::vector<float>& control_input_vec,
                                std::vector<float>* evaluation_vec) const = 0;
+    virtual void GetControl(const std::vector<Point>& waypoints,
+                       std::vector<float>* u_out) const = 0;
   private:
     void AddVectors(float scale1, const std::vector<float>& v1,
                     float scale2, const std::vector<float>& v2,

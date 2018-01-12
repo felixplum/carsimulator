@@ -4,8 +4,8 @@
 GUI::GUI(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::GUI),
-  sim_(0.1),
-  DT_RECORDING_(0.05)
+  sim_(0.04),
+  DT_RECORDING_(0.04)
   {
     state_memory_.AddWriteRecord(sim_.AddNewCar(CT_BICYCLE));
     simulation_started_ = false;
@@ -16,6 +16,9 @@ GUI::GUI(QWidget *parent) :
     scene_ = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene_);
     car_rect_vec_.push_back(scene_->addRect(0, 0, 0, 0));
+    QBrush blueBrush(QColor(0, 100, 255, 120));
+    car_rect_vec_[0]->setBrush(blueBrush);
+    ui->graphicsView->setRenderHints(QPainter::Antialiasing);
 
     // experimental:
     QPixmap background_img;
@@ -114,9 +117,8 @@ void GUI::DrawSimulation() {
 
   pixel_per_meter_ = ui->graphicsView->width()/(CONSTANTS::X_MAX_METER);
 //  ui->graphicsView->fitInView(scene_->sceneRect(), Qt::KeepAspectRatio);
-  QBrush blueBrush(Qt::blue);
-  QPen outlinePen(Qt::black);
-  outlinePen.setWidth(2);
+//  QPen outlinePen(Qt::black);
+//  outlinePen.setWidth(2);
   std::vector<RecordPtr> record_vec = state_memory_.GetRecordPtrVec();
   std::vector<float> state_vec;
   float t_sim;
@@ -143,15 +145,16 @@ void GUI::DrawSimulation() {
   // Draw POV of car
   map_.GetLocalGrid(car_pose, image_pov_);
   QPixmap grid_pixmap = QPixmap::fromImage(*image_pov_);
-  // get waypoints:
-  std::vector<Point> waypoints_local;
-  planner_.GetWaypoints(image_pov_, pixel_per_meter_, &waypoints_local);
+  // get waypoints in grid (pixel) and car (m) coord.:
+  std::vector<Point> waypoints_local_p;
+  std::vector<Point> waypoints_local_m;
+  planner_.GetWaypoints(image_pov_, &waypoints_local_p,
+                        &waypoints_local_m, &pixel_per_meter_);
   // draw waypoints
   QPainter painter(&grid_pixmap);
   painter.setPen(Qt::red);
-  for (int i = 0; i < waypoints_local.size(); ++i) {
-    painter.drawEllipse(waypoints_local[i].y, waypoints_local[i].x,
-                        10, 10);
+  for (uint i = 0; i < waypoints_local_p.size(); ++i) {
+    painter.drawEllipse(waypoints_local_p[i].y, waypoints_local_p[i].x, 10, 10);
   }
   // draw pixmap
   scene_egoview_->addPixmap(grid_pixmap);

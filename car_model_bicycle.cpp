@@ -26,3 +26,8 @@ void CarModelBicycle::EvaluateModel(const std::vector<float>& state_vec,
   (*evaluation_vec)[1] = v_input*sin(phi + beta);
   (*evaluation_vec)[2] = v_input/lr*sin(beta);
 }
+
+void CarModelBicycle::GetControl(const std::vector<Point>& waypoints,
+                                 std::vector<float>* u_out) const {
+
+}
