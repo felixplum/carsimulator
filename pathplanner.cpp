@@ -11,7 +11,7 @@ bool PathPlanner::GetWaypoints(QImage* grid_local,
                                std::vector<Point>* waypoint_vec_local) {
   int n_cols = grid_local->width();
   int n_rows = grid_local->height();
-  int n_waypoints = 5;
+  int n_waypoints = 10;
   int row_increment = n_rows/n_waypoints;
   waypoint_vec_local->clear();
   // start at top of the grid and iterate rows downwards:
@@ -20,25 +20,32 @@ bool PathPlanner::GetWaypoints(QImage* grid_local,
     bool found_right = false;
     Point left_border_pnt;
     Point right_border_pnt;
-    // from col. center, iterate columns to left and right simultaneously:
-    // scan left:
-    for (int i = 0; (i < 0.5*n_cols) && !(found_left&&found_right); ++i) {
-      if(!found_left) {
-        int col_idx = 0.5*n_cols-i-1;
-        QColor c = QColor::fromRgb(grid_local->pixel(col_idx, row_idx));
-        if (c == Qt::black || col_idx == 0) {
-          left_border_pnt = Point(row_idx, col_idx);
-          found_left = true;
-        }
+
+    int col_idx_start = 0.5*n_cols;
+    // init. search at previous center
+    if (!waypoint_vec_local->empty()) {
+      col_idx_start = waypoint_vec_local->back().y;
+    }
+    // scan columns from center to left:
+    for (int col_idx = col_idx_start; col_idx >= 0; --col_idx) {
+      QColor c = QColor::fromRgb(grid_local->pixel(col_idx, row_idx));
+      if (c == Qt::black || col_idx == 0) {
+        // break if init. point is black:
+        if (col_idx == col_idx_start) {break;};
+        // else point is valid border point
+        left_border_pnt = Point(row_idx, col_idx);
+        found_left = true;
+        break;
       }
-      // scan right:
-      if(!found_right) {
-        int col_idx = 0.5*n_cols+i;
-        QColor c = QColor::fromRgb(grid_local->pixel(col_idx, row_idx));
-        if (c == Qt::black || col_idx == n_cols-1) {
-          right_border_pnt = Point(row_idx, col_idx);
-          found_right = true;
-        }
+    }
+    // scan columns from center to right:
+    for (int col_idx = col_idx_start; col_idx < n_cols; ++col_idx) {
+      QColor c = QColor::fromRgb(grid_local->pixel(col_idx, row_idx));
+      if (c == Qt::black || col_idx == n_cols-1) {
+        if (col_idx == col_idx_start) {break;};
+        right_border_pnt = Point(row_idx, col_idx);
+        found_right = true;
+        break;
       }
     }
     // if left and right border point found, take mean
