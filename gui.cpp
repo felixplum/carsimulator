@@ -136,16 +136,25 @@ void GUI::DrawSimulation() {
   float car_length_view = pixel_per_meter_* (CONSTANTS::CAR_LENGTH_METER);
   car_rect_vec_[0]->setRect(car_pose_pixel.x, car_pose_pixel.y-0.5*car_width_view,
                             car_length_view, car_width_view);
-//  car_rect_vec_[0]->setRect(0, car_pose.y,
-//                            car_length_view, car_width_view);
+
   car_rect_vec_[0]->setTransformOriginPoint(car_rect_vec_[0]->boundingRect().center());
   car_rect_vec_[0]->setRotation((CONSTANTS::RAD2DEG)*car_pose_pixel.phi);
-//  car_rect_vec_[0]->setRotation(());
 
   // Draw POV of car
   map_.GetLocalGrid(car_pose, image_pov_);
-  scene_egoview_->addPixmap(QPixmap::fromImage(*image_pov_));
-//  scene_egoview_->setSceneRect(image_pov.rect());
+  QPixmap grid_pixmap = QPixmap::fromImage(*image_pov_);
+  // get waypoints:
+  std::vector<Point> waypoints_local;
+  planner_.GetWaypoints(image_pov_, pixel_per_meter_, &waypoints_local);
+  // draw waypoints
+  QPainter painter(&grid_pixmap);
+  painter.setPen(Qt::red);
+  for (int i = 0; i < waypoints_local.size(); ++i) {
+    painter.drawEllipse(waypoints_local[i].y, waypoints_local[i].x,
+                        10, 10);
+  }
+  // draw pixmap
+  scene_egoview_->addPixmap(grid_pixmap);
 }
 
 

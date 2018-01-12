@@ -8,7 +8,7 @@ Map::Map() {
 void Map::LoadFromPixmap(QPixmap pixmap) {
   // convert to QImage for efficient access
   grid_ = pixmap.toImage();
-  // 1 bit image, occupied = 1/0
+  // 1 bit image, occupied = black = 0
   grid_.convertToFormat(QImage::Format_Mono);
   n_rows_ = grid_.height();
   n_cols_ = grid_.width();
@@ -56,10 +56,13 @@ _____________________________________________________________________________*/
 ////  return grid_.pixel(row_idx, col_idx);
 //}
 
+/* This method returns a grid (image) from the point of view
+of the car, which looks upwards from the bottom center, e.g.
+the car's x-axis pointing upwards */
 void Map::GetLocalGrid(const Pose& pose_curr, QImage* local_grid) {
   float sin_car = sin(-pose_curr.phi);
   float cos_car = cos(-pose_curr.phi);
-  // car's origin in pixels
+  // car's origin in global pixel coord.
   int col_idx0 = pose_curr.x / (CONSTANTS::X_MAX_METER) * n_cols_;
   int row_idx0 = (1-pose_curr.y / (CONSTANTS::Y_MAX_METER)) * n_rows_;
 
@@ -70,17 +73,16 @@ void Map::GetLocalGrid(const Pose& pose_curr, QImage* local_grid) {
   // iterate over pixels in local grid
   for (int rowidx = 0; rowidx < n_rows_local; rowidx++) {
     for (int colidx = 0; colidx < n_cols_local; colidx++) {
-      // car POV centered in bottom center looking up, consider offset from top left
-      // corner of image to get local pixel coord. in car frame
+      // Transform row/col of local grid into pixel coord. in car frame:
       float x_car = n_rows_local - rowidx;
       float y_car = 0.5*n_cols_local - colidx;
-      // transform into global frame (rotate + shift)
+      // Transform into global frame (rotate + shift):
       float col_g = x_car*cos_car - y_car*sin_car + col_idx0;
       float row_g = x_car*sin_car + y_car*cos_car + row_idx0;
-      // check boundary
+      // Check boundary
       if ((row_g < 0) || (row_g > n_rows_-1) ||
           (col_g < 0) || (col_g > n_cols_-1)) {
-        // mark outofbounds-pixel as 0/obstacle/black
+        // mark out-of-bounds-pixel as 0/obstacle/black
         local_grid->setPixel(n_cols_local-colidx-1, rowidx, 0);
         continue;
       }

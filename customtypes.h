@@ -12,6 +12,7 @@ struct Pose {
 struct Point {
   public:
     Point(float x_in, float y_in) : x(x_in), y(y_in) {};
+    Point() {};
     float x;
     float y;
 };
