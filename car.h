@@ -95,6 +95,7 @@ class CarState {
   }
 };
 
+// add names for car models here:
 enum CAR_TYPE {CT_BICYCLE};
 
 /*** Main class declaration ****
@@ -111,15 +112,14 @@ class Car {
                      float dt);
     void SetPovDimension(float width, float height);
     const QImage& GetLocalGrid() const;
+    virtual void GetControl(std::vector<float>* u_out) = 0;
   protected:
-    /* Methods that need to be overwritten by specific car
-       implementation: */
     // Returns xdot = f(x, u); must be overriden by specific car model
     virtual void EvaluateModel(const std::vector<float>& state_vec,
                                const std::vector<float>& control_input_vec,
                                std::vector<float>* evaluation_vec) const = 0;
-    virtual void GetControl(const std::vector<Point>& waypoints,
-                       std::vector<float>* u_out) const = 0;
+
+    const Map& GetGlobalMap() const;
   private:
     void AddVectors(float scale1, const std::vector<float>& v1,
                     float scale2, const std::vector<float>& v2,

@@ -52,6 +52,8 @@ void Simulator::UpdateCars() {
       std::vector<float> u = {0.6, 0.1}; //  v=1, steering = 0.
       car_it->UpdateState(u, dt_sample_);
       car_it->UpdateLocalMap();
+      std::vector<float> u2;
+      car_it->GetControl(&u2);
       //std::cout << car_it->GetCarState() << std::endl;
   }
 }
@@ -83,6 +85,12 @@ void Simulator::ResetState() {
   }
 }
 
+/*
+______________________________________________________________________________
+______________________________________________________________________________
+_________________ Methods for displaying; todo: give car index _______________*/
+
+
 /* Returns ref. to local grid for first car (use for display!)
 _____________________________________________________________________________ */
 const QImage& Simulator::GetLocalGrid() const {
@@ -93,6 +101,17 @@ const QImage& Simulator::GetLocalGrid() const {
   }
 // return map_local_;
 }
+
+// For display purposes:
+void Simulator::GetWaypointsPixel(std::vector<Point>* wp_out) const {
+  if(simulated_cars_.empty()) {
+    std::cerr << "Cannot return local waypoints; no cars available" << std::endl;
+  }
+  CarModelBicycle* bm = dynamic_cast<CarModelBicycle*>(simulated_cars_[0].get());
+  bm->GetWaypointsPixel(wp_out);
+
+}
+
 
 // SetSampleTime()
 

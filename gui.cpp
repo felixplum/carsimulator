@@ -37,6 +37,7 @@ GUI::GUI(QWidget *parent) :
     ui->graphicsView_2->setScene(scene_egoview_);
     ui->graphicsView_2->setSceneRect(0, 0, ui->graphicsView_2->width(), ui->graphicsView_2->height());
     ui->graphicsView_2->setFrameShape(QGraphicsView::NoFrame);
+//    ui->graphicsView_2->setRenderHints(QPainter::Antialiasing);
     // Init. simulator
     std::unique_ptr<Simulator> sim_tmp(new Simulator(0.04, background_img));
     sim_ = std::move(sim_tmp);
@@ -148,9 +149,8 @@ void GUI::DrawSimulation() {
   // get waypoints in grid (pixel) and car (m) coord.:
   std::vector<Point> waypoints_local_p;
   std::vector<Point> waypoints_local_m;
-  planner_.GetWaypoints(image_ref, &waypoints_local_p,
-                        &waypoints_local_m, &pixel_per_meter_);
-//  // draw waypoints
+  sim_->GetWaypointsPixel(&waypoints_local_p);
+  // draw waypoints
   QPainter painter(&grid_pixmap);
   painter.setPen(Qt::red);
   for (uint i = 0; i < waypoints_local_p.size(); ++i) {

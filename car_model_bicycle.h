@@ -14,8 +14,13 @@ public:
     void EvaluateModel(const std::vector<float>& state_vec,
                 const std::vector<float>& control_input_vec,
                 std::vector<float>* evaluation_vec) const;
-    void GetControl(const std::vector<Point>& waypoints,
-                    std::vector<float>* u_out) const;
+    void GetControl(std::vector<float>* u_out);
+    void GetWaypointsPixel(std::vector<Point>* wp_out) const;
+
+    std::vector<Point> waypoint_vec_local_pixel_;
+    std::vector<Point> waypoint_vec_local_meter_;
+private:
+    bool UpdateWaypoints();
 };
 
 #endif // CAR_MODEL_BICYCLE_H

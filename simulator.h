@@ -32,6 +32,7 @@ class Simulator {
    const QImage& GetLocalGrid() const;
    Map map_;
    std::vector<CarPtr> simulated_cars_;
+   void GetWaypointsPixel(std::vector<Point>* wp_out) const;
  private:
    // all cars to be simulated stored here
    void Run();

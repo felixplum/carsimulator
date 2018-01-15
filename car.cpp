@@ -8,6 +8,10 @@ Car::Car(const Map& map_global) :
 CarState& Car::GetCarState() {
   return car_state_;
 }
+
+const Map& Car::GetGlobalMap() const {
+  return map_global_;
+}
 /*
 _____________________________________________________________________________*/
 // Performs RK4 integration step and updates state
@@ -74,9 +78,6 @@ void Car::SetPovDimension(float width, float height) {
   pov_height_m_ = height;
   pov_width_m_ = width;
   float ppm = map_global_.GetPixelPerMeter();
-//  printf("ppm is %f \n", ppm);
   QImage tmp_image(pov_width_m_*ppm, pov_height_m_*ppm, QImage::Format_Mono);
   map_local_ = tmp_image;
-//  std::cout << "product is " << pov_width_m_*ppm << std::endl;
-//  std::cout << "dim " << map_local_.height() << std::endl;
 }
