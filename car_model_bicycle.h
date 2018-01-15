@@ -10,7 +10,7 @@
 class CarModelBicycle : public Car
 {
 public:
-    CarModelBicycle();
+    CarModelBicycle(const Map& map_global);
     void EvaluateModel(const std::vector<float>& state_vec,
                 const std::vector<float>& control_input_vec,
                 std::vector<float>* evaluation_vec) const;

@@ -8,6 +8,8 @@
 #include <cassert>
 #include <boost/thread/mutex.hpp>
 #include "customtypes.h"
+#include "QMainWindow" // for QImage
+#include "map.h"
 //#include <string>
 
 /* CarState encapsulates the state vector and provides methods for access.
@@ -100,11 +102,15 @@ enum CAR_TYPE {CT_BICYCLE};
 
 class Car {
   public:
-    Car();
+    Car(const Map& map_global);
+
     CarState& GetCarState();
+    void UpdateLocalMap();
     // Performs RK4 integration step and updates state
     void UpdateState(const std::vector<float>& control_input_vec,
                      float dt);
+    void SetPovDimension(float width, float height);
+    const QImage& GetLocalGrid() const;
   protected:
     /* Methods that need to be overwritten by specific car
        implementation: */
@@ -119,6 +125,10 @@ class Car {
                     float scale2, const std::vector<float>& v2,
                     std::vector<float>* result) const;
     CarState car_state_;
+    const Map& map_global_;
+    QImage map_local_;
+    float pov_width_m_;
+    float pov_height_m_;
 };
 
 #endif // CAR_H

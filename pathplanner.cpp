@@ -6,12 +6,12 @@ PathPlanner::PathPlanner() {
 /*
  * This method sample local grid and computes center line stored as waypoints
 __________________________________________________________________________*/
-bool PathPlanner::GetWaypoints(QImage* grid_local,
+bool PathPlanner::GetWaypoints(const QImage& grid_local,
                                std::vector<Point>* waypoint_vec_local_pixel,
                                std::vector<Point>* waypoint_vec_local_meter,
                                float* pixel_per_m) {
-  size_t n_cols = grid_local->width();
-  size_t n_rows = grid_local->height();
+  size_t n_cols = grid_local.width();
+  size_t n_rows = grid_local.height();
   int n_waypoints = 10;
   int row_increment = n_rows/n_waypoints;
   waypoint_vec_local_pixel->clear();
@@ -29,7 +29,7 @@ bool PathPlanner::GetWaypoints(QImage* grid_local,
     }
     // scan columns from center to left:
     for (int col_idx = col_idx_start; col_idx >= 0; --col_idx) {
-      QColor c = QColor::fromRgb(grid_local->pixel(col_idx, row_idx));
+      QColor c = QColor::fromRgb(grid_local.pixel(col_idx, row_idx));
       if (c == Qt::black || col_idx == 0) {
         // break if init. point is black:
         if (col_idx == col_idx_start) {break;};
@@ -41,7 +41,7 @@ bool PathPlanner::GetWaypoints(QImage* grid_local,
     }
     // scan columns from center to right:
     for (size_t col_idx = col_idx_start; col_idx < n_cols; ++col_idx) {
-      QColor c = QColor::fromRgb(grid_local->pixel(col_idx, row_idx));
+      QColor c = QColor::fromRgb(grid_local.pixel(col_idx, row_idx));
       if (c == Qt::black || col_idx == n_cols-1) {
         if (col_idx == col_idx_start) {break;};
         right_border_pnt = Point(row_idx, col_idx);

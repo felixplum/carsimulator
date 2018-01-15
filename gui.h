@@ -50,8 +50,7 @@ private:
     float pixel_per_meter_;
     //
     bool simulation_started_;
-    Simulator sim_;
-    Map map_;
+    std::shared_ptr<Simulator> sim_;
     PathPlanner planner_;
     StateMemory state_memory_;
     const float DT_RECORDING_;

@@ -11,6 +11,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/chrono.hpp>
+#include "map.h"
 
 /*This class handles all simulation objects, peforms state updates,
   provides interface to car objects*/
@@ -21,17 +22,20 @@ typedef std::shared_ptr<Car> CarPtr;
 
 class Simulator {
  public:
-   Simulator(float dt_sample);
+   Simulator(float dt_sample, QPixmap& global_grid);
    // to be called from GUI
    CarPtr AddNewCar(CAR_TYPE car_model_type = CT_BICYCLE);
    void UpdateCars();
    // called when pressing Start/Resume
    void ChangeRunStatus(RunState new_state);
    void ResetState();
+   const QImage& GetLocalGrid() const;
+   Map map_;
+   std::vector<CarPtr> simulated_cars_;
  private:
    // all cars to be simulated stored here
    void Run();
-   std::vector<CarPtr> simulated_cars_;
+
    std::vector<std::vector<CarState>> state_histories_; // make own class
    float dt_sample_;
    RunState simulation_run_state_;

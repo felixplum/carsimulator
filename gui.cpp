@@ -4,11 +4,8 @@
 GUI::GUI(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::GUI),
-  sim_(0.04),
   DT_RECORDING_(0.04)
   {
-    state_memory_.AddWriteRecord(sim_.AddNewCar(CT_BICYCLE));
-    simulation_started_ = false;
     ui->setupUi(this);
     plot_window_ = new PlotWindow(parent);
     gui_timer_ = new QTimer(this);
@@ -20,28 +17,31 @@ GUI::GUI(QWidget *parent) :
     car_rect_vec_[0]->setBrush(blueBrush);
     ui->graphicsView->setRenderHints(QPainter::Antialiasing);
 
-    // experimental:
+    // load background image / grid into Graphicsview_1
     QPixmap background_img;
     if(!background_img.load("grid.bmp")) {
       std::cerr << "Couldn't load background grid" << std::endl;
       return;
     }
-    map_.LoadFromPixmap(background_img);
     QPixmap background_img_scaled = background_img.scaledToWidth(550);
     ui->graphicsView->resize(background_img_scaled.width(), background_img_scaled.height());
     scene_->setBackgroundBrush(QBrush(background_img_scaled));
     ui->graphicsView->setCacheMode(QGraphicsView::CacheBackground);
     ui->graphicsView->setSceneRect(0, 0, ui->graphicsView->width(), ui->graphicsView->height());
     ui->graphicsView->setFrameShape(QGraphicsView::NoFrame);
-    // Graphicsview for ego-perspective of car
+    // Graphicsview_2 for ego-perspective of car
     int egoview_width = 200;
     int egoview_height= 200;
     ui->graphicsView_2->resize(egoview_width, egoview_height);
     scene_egoview_ = new QGraphicsScene(this);
     ui->graphicsView_2->setScene(scene_egoview_);
-    image_pov_ = new QImage(egoview_width, egoview_height, QImage::Format_Mono);
     ui->graphicsView_2->setSceneRect(0, 0, ui->graphicsView_2->width(), ui->graphicsView_2->height());
     ui->graphicsView_2->setFrameShape(QGraphicsView::NoFrame);
+    // Init. simulator
+    std::unique_ptr<Simulator> sim_tmp(new Simulator(0.04, background_img));
+    sim_ = std::move(sim_tmp);
+    state_memory_.AddWriteRecord(sim_->AddNewCar(CT_BICYCLE));
+    simulation_started_ = false;
   }
 
 GUI::~GUI() {
@@ -78,7 +78,7 @@ void GUI::on_pushButton_reset_clicked()
   SetStatus(RS_STOPPED); // terminate thread
   // reset state
   state_memory_.ResetState();
-  sim_.ResetState();
+  sim_->ResetState();
 }
 
 //void GUI::closeEvent(QCloseEvent *bar) {
@@ -89,14 +89,14 @@ void GUI::SetStatus(RunState status) {
   if (status == RS_RUNNING) {
       simulation_started_ = true;
       ui->pushButton_startpause->setText("Stop");
-      sim_.ChangeRunStatus(RS_RUNNING);
+      sim_->ChangeRunStatus(RS_RUNNING);
       ui->pushButton_startpause->setStyleSheet("background-color: blue");
       state_memory_.ToggleRecording(true, DT_RECORDING_);
       gui_timer_->start(DT_RECORDING_*1e3);
     } else if (status == RS_STOPPED) {
       simulation_started_ = false;
       ui->pushButton_startpause->setText( "Start");
-      sim_.ChangeRunStatus(RS_STOPPED);
+      sim_->ChangeRunStatus(RS_STOPPED);
       ui->pushButton_startpause->setStyleSheet("");
       state_memory_.ToggleRecording(false);
       gui_timer_->stop();
@@ -129,7 +129,6 @@ void GUI::DrawSimulation() {
    }
 //  Pose car_pose(state_vec[0], state_vec[1], state_vec[2]);
   Pose car_pose(state_vec[0], state_vec[1], state_vec[2]);
-  car_pose.x += 1.05; // todo: remove, on;y to avoid neg. vals
   Pose car_pose_pixel = car_pose;
 //  int val = map_.GetGridValueAtMetricPoint(Point(car_pose.x, car_pose.y));
 //  std::cout << val << std::endl;
@@ -143,14 +142,15 @@ void GUI::DrawSimulation() {
   car_rect_vec_[0]->setRotation((CONSTANTS::RAD2DEG)*car_pose_pixel.phi);
 
   // Draw POV of car
-  map_.GetLocalGrid(car_pose, image_pov_);
-  QPixmap grid_pixmap = QPixmap::fromImage(*image_pov_);
+  const QImage &image_ref = sim_->GetLocalGrid()
+                            .scaledToWidth(ui->graphicsView_2->width());
+  QPixmap grid_pixmap = QPixmap::fromImage(image_ref);
   // get waypoints in grid (pixel) and car (m) coord.:
   std::vector<Point> waypoints_local_p;
   std::vector<Point> waypoints_local_m;
-  planner_.GetWaypoints(image_pov_, &waypoints_local_p,
+  planner_.GetWaypoints(image_ref, &waypoints_local_p,
                         &waypoints_local_m, &pixel_per_meter_);
-  // draw waypoints
+//  // draw waypoints
   QPainter painter(&grid_pixmap);
   painter.setPen(Qt::red);
   for (uint i = 0; i < waypoints_local_p.size(); ++i) {

@@ -1,6 +1,9 @@
  #include "car.h"
 
-Car::Car() {}
+Car::Car(const Map& map_global) :
+  map_global_(map_global)
+{
+}
 
 CarState& Car::GetCarState() {
   return car_state_;
@@ -50,4 +53,30 @@ void Car::AddVectors(float scale1, const std::vector<float>& v1,
   for (size_t i = 0; i < v1.size(); ++i) {
     (*result)[i] = scale1*v1[i] + scale2*v2[i];
   }
+}
+/*
+______________________________________________________________________________*/
+void Car::UpdateLocalMap() {
+  std::vector<float> state_vec = GetCarState().GetStateVector();
+  map_global_.GetLocalGrid(Pose(state_vec[0], state_vec[1], state_vec[2]),
+                           &map_local_);
+}
+
+const QImage& Car::GetLocalGrid() const {
+//  std::cout << "dim " << map_local_.height() << std::endl;
+  return map_local_;
+}
+
+/*
+ * Set the region in [Meter] the car can look to the side/front
+______________________________________________________________________________*/
+void Car::SetPovDimension(float width, float height) {
+  pov_height_m_ = height;
+  pov_width_m_ = width;
+  float ppm = map_global_.GetPixelPerMeter();
+//  printf("ppm is %f \n", ppm);
+  QImage tmp_image(pov_width_m_*ppm, pov_height_m_*ppm, QImage::Format_Mono);
+  map_local_ = tmp_image;
+//  std::cout << "product is " << pov_width_m_*ppm << std::endl;
+//  std::cout << "dim " << map_local_.height() << std::endl;
 }

@@ -1,8 +1,11 @@
 #include "simulator.h"
 
-Simulator::Simulator(float dt_sample) :
+Simulator::Simulator(float dt_sample,
+                     QPixmap& global_grid) :
   dt_sample_(dt_sample),
-  simulation_run_state_(RS_STOPPED) {
+  simulation_run_state_(RS_STOPPED),
+  map_(global_grid)
+{
 }
 
 /* main thread loop
@@ -22,7 +25,8 @@ CarPtr Simulator::AddNewCar(CAR_TYPE car_model_type) {
   switch(car_model_type) {
     case CT_BICYCLE: {
       // explicit ctor for unique_ptr
-      CarPtr car(new CarModelBicycle);
+      CarPtr car(new CarModelBicycle(map_));
+      car->SetPovDimension(1., 1.);
       // only one owner of unique_ptr, use move semantics
       simulated_cars_.push_back(car);
       // todo: create state_history for each car
@@ -47,6 +51,7 @@ void Simulator::UpdateCars() {
     // or call UpdateStep() for applying external input (e.g. stored in file)
       std::vector<float> u = {0.6, 0.1}; //  v=1, steering = 0.
       car_it->UpdateState(u, dt_sample_);
+      car_it->UpdateLocalMap();
       //std::cout << car_it->GetCarState() << std::endl;
   }
 }
@@ -77,6 +82,18 @@ void Simulator::ResetState() {
       car_it->GetCarState().ResetState();
   }
 }
+
+/* Returns ref. to local grid for first car (use for display!)
+_____________________________________________________________________________ */
+const QImage& Simulator::GetLocalGrid() const {
+  if(simulated_cars_.empty()) {
+    std::cerr << "Cannot return local grid; no cars avaiblable" << std::endl;
+  } else {
+    return (simulated_cars_[0]->GetLocalGrid());
+  }
+// return map_local_;
+}
+
 // SetSampleTime()
 
 // attachInputTimeSeriesToCar

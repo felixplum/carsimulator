@@ -2,10 +2,8 @@
 
 const double PI  = 3.141592653589793238463;
 
-Map::Map() {
-}
-
-void Map::LoadFromPixmap(QPixmap pixmap) {
+Map::Map(const QPixmap& pixmap)
+{
   // convert to QImage for efficient access
   grid_ = pixmap.toImage();
   // 1 bit image, occupied = black = 0
@@ -13,6 +11,7 @@ void Map::LoadFromPixmap(QPixmap pixmap) {
   n_rows_ = grid_.height();
   n_cols_ = grid_.width();
 }
+
 /*
 _____________________________________________________________________________*/
 //void Map::GenerateTestMap() {
@@ -59,7 +58,7 @@ _____________________________________________________________________________*/
 /* This method returns a grid (image) from the point of view
 of the car, which looks upwards from the bottom center, e.g.
 the car's x-axis pointing upwards */
-void Map::GetLocalGrid(const Pose& pose_curr, QImage* local_grid) {
+void Map::GetLocalGrid(const Pose& pose_curr, QImage* local_grid) const {
   float sin_car = sin(-pose_curr.phi);
   float cos_car = cos(-pose_curr.phi);
   // car's origin in global pixel coord.
@@ -69,7 +68,7 @@ void Map::GetLocalGrid(const Pose& pose_curr, QImage* local_grid) {
   int n_cols_local = local_grid->width();
   int n_rows_local = local_grid->height();
   // fill to remove artifacts
-  local_grid->fill(1);
+//  local_grid->fill(1);
   // iterate over pixels in local grid
   for (int rowidx = 0; rowidx < n_rows_local; rowidx++) {
     for (int colidx = 0; colidx < n_cols_local; colidx++) {
@@ -147,3 +146,7 @@ void Map::TransformPoseintoSystem(const Pose& pose_input, const Pose& frame_new,
 // }
 
 /**/
+
+float Map::GetPixelPerMeter() const {
+  return grid_.width()/CONSTANTS::X_MAX_METER;
+}

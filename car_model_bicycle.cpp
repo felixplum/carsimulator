@@ -1,7 +1,7 @@
 #include "car_model_bicycle.h"
 
-CarModelBicycle::CarModelBicycle() {
-  std::vector<float> init_state = {0,0,0};
+CarModelBicycle::CarModelBicycle(const Map& map_global) : Car(map_global) {
+  std::vector<float> init_state = {1.05,0,0};
   std::vector<float> init_input = {0,0};
   std::vector<std::string> state_names = {"x","y","phi"};  
   GetCarState().InitState(init_state, init_input, state_names);
