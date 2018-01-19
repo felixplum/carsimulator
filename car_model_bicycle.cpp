@@ -28,7 +28,7 @@ void CarModelBicycle::EvaluateModel(const std::vector<float>& state_vec,
 }
 
 void CarModelBicycle::GetControl(std::vector<float>* u_out) {
-  const float U_MAX = 80./(CONSTANTS::RAD2DEG);
+  const float U_MAX = 45./(CONSTANTS::RAD2DEG); // max. 45deg steering angle
   static float last_steering = 0;
 
   UpdateWaypoints();
@@ -105,8 +105,6 @@ bool CarModelBicycle::UpdateWaypoints() {
       center_pnt.x = 0.5*(left_border_pnt.x + right_border_pnt.x);
       center_pnt.y = 0.5*(left_border_pnt.y + right_border_pnt.y);
       waypoint_vec_local_pixel_.push_back(center_pnt);
-//      printf("added wp %f %f", center_pnt.x, center_pnt.y);
-//      std::cout<<std::endl;
     }
   }
 
