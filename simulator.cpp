@@ -2,9 +2,9 @@
 
 Simulator::Simulator(float dt_sample,
                      QPixmap& global_grid) :
+  map_(global_grid),
   dt_sample_(dt_sample),
-  simulation_run_state_(RS_STOPPED),
-  map_(global_grid)
+  simulation_run_state_(RS_STOPPED)
 {
 }
 

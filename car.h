@@ -45,8 +45,8 @@ class CarState {
         std::cerr << "Cannot reset car state; state not init." << std::endl;
       }
       state_values_ = std::vector<float>(state_values_.size(), 0.);
-      state_values_[0] = 1.;
-      state_values_[1] = 0.1;
+      state_values_[0] = SIM::x_init;
+      state_values_[1] = SIM::y_init;
       input_values_ = std::vector<float>(input_values_.size(), 0.);
       current_time_ = 0.;
     }

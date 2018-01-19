@@ -1,7 +1,7 @@
 #include "car_model_bicycle.h"
 
 CarModelBicycle::CarModelBicycle(const Map& map_global) : Car(map_global) {
-  std::vector<float> init_state = {1.05,0.1,0};
+  std::vector<float> init_state = {SIM::x_init, SIM::y_init, 0};
   std::vector<float> init_input = {0,0};
   std::vector<std::string> state_names = {"x","y","phi"};  
   GetCarState().InitState(init_state, init_input, state_names);
@@ -32,7 +32,7 @@ void CarModelBicycle::GetControl(std::vector<float>* u_out) {
   static float last_steering = 0;
 
   UpdateWaypoints();
-  int wp_idx = 0.5*waypoint_vec_local_meter_.size();
+  size_t wp_idx = 1;//0.5*waypoint_vec_local_meter_.size();
   if (waypoint_vec_local_meter_.size()<=wp_idx) {
       (*u_out)[1] = last_steering;
       return;
@@ -54,7 +54,8 @@ bool CarModelBicycle::UpdateWaypoints() {
   int row_increment = n_rows/n_waypoints;
   waypoint_vec_local_pixel_.clear();
   // start at top of the grid and iterate rows downwards:
-  for (size_t row_idx = 0; row_idx < n_rows; row_idx += row_increment) {
+  for (size_t row_idx_tmp = 0; row_idx_tmp < n_rows; row_idx_tmp += row_increment) {
+    size_t row_idx = n_rows - row_idx_tmp - 1;
     bool found_left = false;
     bool found_right = false;
     Point left_border_pnt;

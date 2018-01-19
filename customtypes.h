@@ -25,5 +25,10 @@ namespace CONSTANTS {
   const float CAR_LENGTH_METER = 0.1;
 }
 
+namespace SIM {
+ const float x_init = 1.05;
+ const float y_init = 0.1;
+}
+
 
 #endif // CUSTOMTYPES_H

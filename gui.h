@@ -37,6 +37,7 @@ private:
     void SetStatus(RunState status);
     void DrawSimulation();
     void TransformCarToViewCoord(Pose* car_pose) const;
+    void AddCar();
     //
     Ui::GUI *ui;
     PlotWindow *plot_window_;
