@@ -1,7 +1,7 @@
 #include "car_model_bicycle.h"
 
 CarModelBicycle::CarModelBicycle(const Map& map_global) : Car(map_global) {
-  std::vector<float> init_state = {1.05,0,0};
+  std::vector<float> init_state = {1.05,0.1,0};
   std::vector<float> init_input = {0,0};
   std::vector<std::string> state_names = {"x","y","phi"};  
   GetCarState().InitState(init_state, init_input, state_names);
@@ -28,7 +28,19 @@ void CarModelBicycle::EvaluateModel(const std::vector<float>& state_vec,
 }
 
 void CarModelBicycle::GetControl(std::vector<float>* u_out) {
+  const float U_MAX = 80./(CONSTANTS::RAD2DEG);
+  static float last_steering = 0;
+
   UpdateWaypoints();
+  int wp_idx = 0.5*waypoint_vec_local_meter_.size();
+  if (waypoint_vec_local_meter_.size()<=wp_idx) {
+      (*u_out)[1] = last_steering;
+      return;
+  }
+  Point& wp = waypoint_vec_local_meter_[wp_idx];
+  float u_tmp = std::atan2(wp.y, wp.x);
+  (*u_out)[1] = std::max(1.*std::min(1.*u_tmp, 1.*U_MAX), -1.*U_MAX);
+  last_steering = (*u_out)[1];
 }
 
 // Waypoints should be plotted later on, therefore use member variable
@@ -50,8 +62,18 @@ bool CarModelBicycle::UpdateWaypoints() {
 
     size_t col_idx_start = 0.5*n_cols;
     // init. search at previous center
-    if (!waypoint_vec_local_pixel_.empty()) {
+    int n_size = waypoint_vec_local_pixel_.size();
+    if (n_size == 1) {
+       // take prev. column to start
       col_idx_start = waypoint_vec_local_pixel_.back().y;
+    } else if (n_size > 1) {
+      // linearly extrapolate
+      float dx = waypoint_vec_local_pixel_[n_size-1].x -
+                 waypoint_vec_local_pixel_[n_size-2].x;
+      float dy = waypoint_vec_local_pixel_[n_size-1].y -
+                 waypoint_vec_local_pixel_[n_size-2].y;
+      col_idx_start = waypoint_vec_local_pixel_[n_size-1].y +
+          dy/dx * row_increment;
     }
     // scan columns from center to left:
     for (int col_idx = col_idx_start; col_idx >= 0; --col_idx) {

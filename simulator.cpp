@@ -49,12 +49,13 @@ void Simulator::UpdateCars() {
   for (auto& car_it : simulated_cars_) {
     // either call ApplyControlStep() to let car decide control input
     // or call UpdateStep() for applying external input (e.g. stored in file)
-      std::vector<float> u = {0.6, 0.1}; //  v=1, steering = 0.
+//      std::vector<float> u = {0.6, 0.1}; //  v=1, steering = 0.
+      std::vector<float> u = {0.5, 0};
+      car_it->GetControl(&u);
       car_it->UpdateState(u, dt_sample_);
       car_it->UpdateLocalMap();
-      std::vector<float> u2;
-      car_it->GetControl(&u2);
-      //std::cout << car_it->GetCarState() << std::endl;
+//      std::cout << "u: " << u[1] << std::endl;
+//      std::cout << car_it->GetCarState() << std::endl;
   }
 }
 

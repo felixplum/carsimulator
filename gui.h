@@ -10,7 +10,6 @@
 #include <QTimer>
 #include "customtypes.h"
 #include "map.h"
-#include "pathplanner.h"
 
 namespace Ui {
 class GUI;
@@ -51,7 +50,6 @@ private:
     //
     bool simulation_started_;
     std::shared_ptr<Simulator> sim_;
-    PathPlanner planner_;
     StateMemory state_memory_;
     const float DT_RECORDING_;
 };

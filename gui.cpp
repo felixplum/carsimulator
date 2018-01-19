@@ -19,7 +19,7 @@ GUI::GUI(QWidget *parent) :
 
     // load background image / grid into Graphicsview_1
     QPixmap background_img;
-    if(!background_img.load("grid.bmp")) {
+    if(!background_img.load("grid_round_obstacle.bmp")) {
       std::cerr << "Couldn't load background grid" << std::endl;
       return;
     }
@@ -153,7 +153,7 @@ void GUI::DrawSimulation() {
   // draw waypoints
   QPainter painter(&grid_pixmap);
   painter.setPen(Qt::red);
-  for (uint i = 0; i < waypoints_local_p.size(); ++i) {
+  for (size_t i = 0; i < waypoints_local_p.size(); ++i) {
     painter.drawEllipse(waypoints_local_p[i].y, waypoints_local_p[i].x, 10, 10);
   }
   // draw pixmap
