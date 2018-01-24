@@ -10,6 +10,7 @@
 #include <QTimer>
 #include "customtypes.h"
 #include "map.h"
+#include "udp_client.h"
 
 namespace Ui {
 class GUI;
@@ -33,11 +34,14 @@ private slots:
 
   void on_pushButton_reset_clicked();
 
+  void on_pushButton_udp_clicked();
+
 private:
     void SetStatus(RunState status);
     void DrawSimulation();
     void TransformCarToViewCoord(Pose* car_pose) const;
     void AddCar();
+    void RunListener();
     //
     Ui::GUI *ui;
     PlotWindow *plot_window_;
@@ -51,8 +55,10 @@ private:
     //
     bool simulation_started_;
     std::shared_ptr<Simulator> sim_;
+    CarPtr car_udp_;
     StateMemory state_memory_;
     const float DT_RECORDING_;
+    bool listen_to_udp_;
 };
 
 #endif // GUI_H

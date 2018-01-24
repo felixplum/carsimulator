@@ -2,12 +2,14 @@
 #define STATE_MEMORY_H
 
 #include<car.h>
-#include<simulator.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <cassert>
 #include <memory> // for smart ptr
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/chrono.hpp>
 #include <QWidget>
 /* This class provides methods for storing and accessing states
    #Usage:
@@ -88,6 +90,7 @@ class StateMemory : QWidget {
 //  void SetCallback(std::function<void()> callback);
   void AddReadRecord(CarPtr car, const std::string& file_name);
   void AddWriteRecord(CarPtr car);
+  bool RemoveRecordAtIdx(size_t idx);
   void ToggleRecording(bool activate_recording, float dt_sample = 0.1);
   std::vector<RecordPtr> GetRecordPtrVec() const;
   void ResetState();

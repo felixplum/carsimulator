@@ -4,7 +4,8 @@
 GUI::GUI(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::GUI),
-  DT_RECORDING_(0.04)
+  DT_RECORDING_(0.04),
+  listen_to_udp_(false)
   {
     // basic gui setup
     ui->setupUi(this);
@@ -83,6 +84,33 @@ void GUI::on_pushButton_reset_clicked()
   sim_->ResetState();
 }
 
+void GUI::RunListener() {
+  UDPClient client(car_udp_, listen_to_udp_);
+}
+
+
+void GUI::on_pushButton_udp_clicked() {
+  static bool is_active = false;
+  is_active = !is_active;
+  listen_to_udp_ = is_active;
+  if (is_active) {
+    ui->pushButton_udp->setText("Disconnect");
+    ui->pushButton_udp->setStyleSheet("background-color: green");
+    CarPtr car_udp = sim_->AddNewCar(CT_BICYCLE);
+    car_udp_ = std::move(car_udp);
+    state_memory_.AddWriteRecord(car_udp_);
+    boost::thread t(&GUI::RunListener, this);
+  } else {
+    ui->pushButton_udp->setText("Connect \n to hardware");
+    ui->pushButton_udp->setStyleSheet("");
+//    SetStatus(RS_STOPPED);
+    sim_->RemoveCarAtIdx(1);
+    state_memory_.RemoveRecordAtIdx(1);
+//    std::cout << "del. record" << std::endl;
+  }
+
+}
+
 void GUI::SetStatus(RunState status) {
   if (status == RS_RUNNING) {
       simulation_started_ = true;
@@ -100,6 +128,7 @@ void GUI::SetStatus(RunState status) {
       gui_timer_->stop();
     }
 }
+
 
 /*
 _________________________________________________________________________*/
@@ -128,6 +157,7 @@ void GUI::DrawSimulation() {
   std::vector<RecordPtr> record_vec = state_memory_.GetRecordPtrVec();
   std::vector<float> state_vec;
   float t_sim;
+  if (record_vec.empty() || !record_vec[0]) return;
   record_vec[0]->ReadLastState(&state_vec, &t_sim);
   if (state_vec.empty()) {
       std::cout <<"state empty :(" << std::endl;
@@ -161,5 +191,4 @@ void GUI::DrawSimulation() {
   // draw pixmap
   scene_egoview_->addPixmap(grid_pixmap);
 }
-
 

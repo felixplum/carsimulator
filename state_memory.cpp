@@ -42,6 +42,14 @@ void StateMemory::AddWriteRecord(CarPtr car) {
   records_vec_.push_back(std::move(new_record));
   car_vec_.push_back(car);
 }
+bool StateMemory::RemoveRecordAtIdx(size_t idx) {
+  if (idx >= records_vec_.size()) {
+    return false;
+  }
+  records_vec_.erase(records_vec_.begin() + idx);
+  car_vec_.erase(car_vec_.begin() + idx);
+  return true;
+}
 /*
 _____________________________________________________________________________*/
 void StateMemory::ToggleRecording(bool activate_recording, float dt_sample) {

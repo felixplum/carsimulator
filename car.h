@@ -133,4 +133,6 @@ class Car {
     float pov_height_m_;
 };
 
+typedef std::shared_ptr<Car> CarPtr;
+
 #endif // CAR_H

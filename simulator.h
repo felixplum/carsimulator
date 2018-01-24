@@ -18,13 +18,12 @@
 
 enum RunState {RS_READY, RS_RUNNING, RS_PAUSED, RS_STOPPED};
 
-typedef std::shared_ptr<Car> CarPtr;
-
 class Simulator {
  public:
    Simulator(float dt_sample, QPixmap& global_grid);
    // to be called from GUI
    CarPtr AddNewCar(CAR_TYPE car_model_type = CT_BICYCLE);
+   bool RemoveCarAtIdx(size_t idx);
    void UpdateCars();
    // called when pressing Start/Resume
    void ChangeRunStatus(RunState new_state);

@@ -41,6 +41,14 @@ CarPtr Simulator::AddNewCar(CAR_TYPE car_model_type) {
   }
 }
 
+bool Simulator::RemoveCarAtIdx(size_t idx) {
+  if (idx >= simulated_cars_.size()) {
+    return false;
+  }
+  simulated_cars_.erase(simulated_cars_.begin() + idx);
+  return true;
+}
+
 /* Controls must be supplied externally,
    either by offline stored vals. or controls
 ____________________________________________________________________________*/
