@@ -40,7 +40,8 @@ private:
     void SetStatus(RunState status);
     void DrawSimulation();
     void TransformCarToViewCoord(Pose* car_pose) const;
-    void AddCar();
+    CarPtr AddCar(bool add_to_sim);
+    bool RemoveCar(CarPtr car_ptr);
     void RunListener();
     //
     Ui::GUI *ui;
@@ -52,13 +53,16 @@ private:
     QImage *image_pov_;
     std::vector<QGraphicsRectItem*> car_rect_vec_;
     float pixel_per_meter_;
+    QPixmap background_img_;
     //
     bool simulation_started_;
-    std::shared_ptr<Simulator> sim_;
+    Simulator sim_;
+    std::shared_ptr<Map> map_;
+    std::vector<CarPtr> cars_;
     CarPtr car_udp_;
     StateMemory state_memory_;
     const float DT_RECORDING_;
-    bool listen_to_udp_;
+    UDPClient client_;
 };
 
 #endif // GUI_H
