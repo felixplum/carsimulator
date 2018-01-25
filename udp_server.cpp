@@ -11,5 +11,6 @@ UDPServer::UDPServer() :
 }
 
 void UDPServer::SendState(const std::vector<float>& state) {
-  socket_.send_to(ba::buffer((char*)&state.front(), state.size()*4), endpoint_client_);
+//  socket_.send_to(ba::buffer((char*)&state.front(), state.size()*4), endpoint_client_);
+  socket_.send_to(ba::buffer(state), endpoint_client_);
 }
