@@ -90,7 +90,7 @@ class StateMemory : QWidget {
 //  void SetCallback(std::function<void()> callback);
   void AddReadRecord(CarPtr car, const std::string& file_name);
   void AddWriteRecord(CarPtr car);
-  bool RemoveRecordAtIdx(size_t idx);
+  bool RemoveRecordPtr(CarPtr car_ptr);
   void ToggleRecording(bool activate_recording, float dt_sample = 0.1);
   std::vector<RecordPtr> GetRecordPtrVec() const;
   void ResetState();

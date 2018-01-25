@@ -20,16 +20,16 @@ enum RunState {RS_READY, RS_RUNNING, RS_PAUSED, RS_STOPPED};
 
 class Simulator {
  public:
-   Simulator(float dt_sample, QPixmap& global_grid);
+   Simulator(float dt_sample);
    // to be called from GUI
-   CarPtr AddNewCar(CAR_TYPE car_model_type = CT_BICYCLE);
-   bool RemoveCarAtIdx(size_t idx);
+//   CarPtr AddNewCar(CAR_TYPE car_model_type = CT_BICYCLE);
+   void AddCarPtr(CarPtr car_ptr);
+   bool RemoveCarPtr(CarPtr car_ptr);
    void UpdateCars();
    // called when pressing Start/Resume
    void ChangeRunStatus(RunState new_state);
    void ResetState();
    const QImage& GetLocalGrid() const;
-   Map map_;
    std::vector<CarPtr> simulated_cars_;
    void GetWaypointsPixel(std::vector<Point>* wp_out) const;
  private:

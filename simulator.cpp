@@ -1,12 +1,9 @@
 #include "simulator.h"
 
-Simulator::Simulator(float dt_sample,
-                     QPixmap& global_grid) :
-  map_(global_grid),
+Simulator::Simulator(float dt_sample) :
   dt_sample_(dt_sample),
   simulation_run_state_(RS_STOPPED)
-{
-}
+{}
 
 /* main thread loop
 ___________________________________________________________________________*/
@@ -21,32 +18,39 @@ void Simulator::Run() {
 
 /*
 _____________________________________________________________________________*/
-CarPtr Simulator::AddNewCar(CAR_TYPE car_model_type) {
-  switch(car_model_type) {
-    case CT_BICYCLE: {
-      // explicit ctor for unique_ptr
-      CarPtr car(new CarModelBicycle(map_));
-      car->SetPovDimension(1., 1.);
-      // only one owner of unique_ptr, use move semantics
-      simulated_cars_.push_back(car);
-      // todo: create state_history for each car
-      std::cout << "Added new car of type CT_BICYCLE" << std::endl;
-      return car;
-      break;
-    }
-    default:
-      std::cerr << "Couldn't add car; invalid type" << std::endl;
-      return nullptr;
-      break;
-  }
+//CarPtr Simulator::AddNewCar(CAR_TYPE car_model_type) {
+//  switch(car_model_type) {
+//    case CT_BICYCLE: {
+//      // explicit ctor for unique_ptr
+//      CarPtr car(new CarModelBicycle(map_));
+//      car->SetPovDimension(1., 1.);
+//      // only one owner of unique_ptr, use move semantics
+//      simulated_cars_.push_back(car);
+//      // todo: create state_history for each car
+//      std::cout << "Added new car of type CT_BICYCLE" << std::endl;
+//      return car;
+//      break;
+//    }
+//    default:
+//      std::cerr << "Couldn't add car; invalid type" << std::endl;
+//      return nullptr;
+//      break;
+//  }
+//}
+void Simulator::AddCarPtr(CarPtr car_ptr) {
+  simulated_cars_.push_back(car_ptr);
 }
 
-bool Simulator::RemoveCarAtIdx(size_t idx) {
-  if (idx >= simulated_cars_.size()) {
-    return false;
+bool Simulator::RemoveCarPtr(CarPtr car_ptr) {
+  for (size_t i = 0; i < simulated_cars_.size(); ++i) {
+    if (car_ptr == simulated_cars_[i]) {
+      simulated_cars_.erase(simulated_cars_.begin()+i);
+      std::cout << "Removed car from simulation" << std::endl;
+      return true;
+    }
   }
-  simulated_cars_.erase(simulated_cars_.begin() + idx);
-  return true;
+  std::cout << "Could not removed car from simulation - not found" << std::endl;
+  return false;
 }
 
 /* Controls must be supplied externally,
@@ -55,15 +59,10 @@ ____________________________________________________________________________*/
 
 void Simulator::UpdateCars() {
   for (auto& car_it : simulated_cars_) {
-    // either call ApplyControlStep() to let car decide control input
-    // or call UpdateStep() for applying external input (e.g. stored in file)
-//      std::vector<float> u = {0.6, 0.1}; //  v=1, steering = 0.
       std::vector<float> u = {0.5, 0};
       car_it->GetControl(&u);
       car_it->UpdateState(u, dt_sample_);
       car_it->UpdateLocalMap();
-//      std::cout << "u: " << u[1] << std::endl;
-//      std::cout << car_it->GetCarState() << std::endl;
   }
 }
 
