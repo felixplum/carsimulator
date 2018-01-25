@@ -62,11 +62,17 @@ class CarState {
     }
     void UpdateStateVector(const std::vector<float>& new_state, float dt) {
       boost::mutex::scoped_lock(rw_mutex_);
+      if (is_init_) assert(state_values_.size() == new_state.size());
       state_values_ = new_state;
       current_time_ += dt;
     }
+    void SetCurrentTime(float t) {
+      boost::mutex::scoped_lock(rw_mutex_);
+      current_time_ = t;
+    }
     void UpdateInputVector(const std::vector<float>& new_input) {
       boost::mutex::scoped_lock(rw_mutex_);
+      if (is_init_) assert(input_values_.size() == new_input.size());
       input_values_ = new_input;
     }
 

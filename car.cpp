@@ -40,7 +40,7 @@ void Car::UpdateState(const std::vector<float>& control_input_vec,
   // add integral to old state vector (x_new = xk_old + dt*xdot)
   AddVectors(1.0, addition_tmp, 1.0, state_vec, &addition_tmp);
   GetCarState().UpdateStateVector(addition_tmp, dt);
-  GetCarState().UpdateInputVector(addition_tmp);
+  GetCarState().UpdateInputVector(control_input_vec);
 }
 // Returns xdot = f(x, u); must be overriden by specific car model
 // void EvaluateModel(const std::vector<float>& state_vec,
