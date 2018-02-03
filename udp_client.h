@@ -9,9 +9,8 @@
 #include <boost/smart_ptr.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
 #include <car.h>
+#include <thread>
 
 namespace ba = boost::asio;
 
@@ -32,7 +31,8 @@ private:
   size_t n_receive_size_;
   std::vector<float> receive_buffer_;
   CarPtr car_udp_;
-  boost::scoped_ptr<boost::thread> thread_;
+  boost::scoped_ptr<std::thread> thread_;
+  bool is_bind_;
 };
 
 #endif // UDP_CLIENT_H

@@ -8,10 +8,9 @@
 #include <algorithm>
 #include <cassert>
 #include <memory> // for smart ptr
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/chrono.hpp>
 #include "map.h"
+#include <chrono>
+#include <thread>
 
 /*This class handles all simulation objects, peforms state updates,
   provides interface to car objects*/
@@ -22,16 +21,13 @@ class Simulator {
  public:
    Simulator(float dt_sample);
    // to be called from GUI
-//   CarPtr AddNewCar(CAR_TYPE car_model_type = CT_BICYCLE);
    void AddCarPtr(CarPtr car_ptr);
    bool RemoveCarPtr(CarPtr car_ptr);
    void UpdateCars();
    // called when pressing Start/Resume
    void ChangeRunStatus(RunState new_state);
    void ResetState();
-   const QImage& GetLocalGrid() const;
    std::vector<CarPtr> simulated_cars_;
-   void GetWaypointsPixel(std::vector<Point>* wp_out) const;
  private:
    // all cars to be simulated stored here
    void Run();
@@ -40,5 +36,6 @@ class Simulator {
    float dt_sample_;
    RunState simulation_run_state_;
    boost::mutex simulation_state_mutex_;
+   std::unique_ptr<std::thread> thread_;
 };
 #endif // SIMULATOR_H

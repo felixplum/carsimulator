@@ -59,6 +59,10 @@ _____________________________________________________________________________*/
 of the car, which looks upwards from the bottom center, e.g.
 the car's x-axis pointing upwards */
 void Map::GetLocalGrid(const Pose& pose_curr, QImage* local_grid) const {
+//  static boost::mutex access_mutex;
+
+//  boost::mutex::scoped_lock lock(access_mutex);
+
   float sin_car = sin(-pose_curr.phi);
   float cos_car = cos(-pose_curr.phi);
   // car's origin in global pixel coord.
@@ -87,7 +91,7 @@ void Map::GetLocalGrid(const Pose& pose_curr, QImage* local_grid) const {
       }
       // lookup pixel value in global map and fill into local one
       QColor c = QColor::fromRgb(grid_.pixel(col_g, row_g));
-      local_grid->setPixel(n_cols_local-colidx-1, rowidx, c==Qt::black?0:1);
+      local_grid->setPixel(n_cols_local-colidx-1, rowidx, c==Qt::white?1:0);
     }
   }
 }
@@ -104,6 +108,14 @@ void Map::TransformPoseintoSystem(const Pose& pose_input, const Pose& frame_new,
   pose_in_new_frame->y = dx_global * sin(dphi) + dy_global * cos(dphi);
   pose_in_new_frame->phi = dphi;
 }
+
+void Map::SetMap(const QPixmap& pixmap) {
+   grid_ = pixmap.toImage();
+   n_rows_ = grid_.height();
+   n_cols_ = grid_.width();
+}
+  // convert to QImage for efficient access
+
 
 /* todo: iterate over multiple points, go in both directions, do basic testing */
 //std::vector<Point> Map::GetCenterPathAtPose(const Pose& pose_current) {

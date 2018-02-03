@@ -1,34 +1,37 @@
-#include "car_model_bicycle.h"
+#include "car_model_bicycle_dynamic.h"
 
-CarModelBicycle::CarModelBicycle(const Map& map_global) : Car(map_global) {
+
+CarModelBicycleDynamic::CarModelBicycleDynamic(const Map& map_global) : Car(map_global) {
   // state: x, y, phi, xdot, ydot
-  std::vector<float> init_state = {SIM::x_init, SIM::y_init, 0};
+  std::vector<float> init_state = {SIM::x_init, SIM::y_init, 0, 0};
   std::vector<float> init_input = {0,0};
   last_steering_ = 0;
-  std::vector<std::string> state_names = {"x","y","phi"};
+  std::vector<std::string> state_names = {"x","y","phi", "v"};
   GetCarState().InitState(init_state, init_input, state_names);
 }
 /*
 _____________________________________________________________________________*/
 /* Model according to
   http://www.me.berkeley.edu/~frborrel/pdfpub/IV_KinematicMPC_jason.pdf */
-void CarModelBicycle::EvaluateModel(const std::vector<float>& state_vec,
+void CarModelBicycleDynamic::EvaluateModel(const std::vector<float>& state_vec,
                                     const std::vector<float>& control_input_vec,
                                     std::vector<float>* evaluation_vec) const {
   // global pose:
   float phi = state_vec[2];
-  float v_input = control_input_vec[0];
+  float v = state_vec[3];
+  float force_input = control_input_vec[0];
   float steering_input = control_input_vec[1];
-  evaluation_vec->resize(3);
-  // angle of velocity of center of mass rel. to longitudinal axis 
+  evaluation_vec->resize(4);
+  // angle of velocity of center of mass rel. to longitudinal axis
   float beta = atan(params_.lr/(params_.lr+params_.lf)*tan(steering_input));
-  (*evaluation_vec)[0] = v_input*cos(phi + beta);
-  (*evaluation_vec)[1] = v_input*sin(phi + beta);
-  (*evaluation_vec)[2] = v_input/params_.lr*sin(beta);
+  (*evaluation_vec)[0] = v*cos(phi + beta);
+  (*evaluation_vec)[1] = v*sin(phi + beta);
+  (*evaluation_vec)[2] = v/params_.lr*sin(beta);
+  (*evaluation_vec)[3] = force_input / params_.mass - 2*v*v; // + drag force
 }
 
-void CarModelBicycle::GetControl(std::vector<float>* u_out) {
-
+void CarModelBicycleDynamic::GetControl(std::vector<float>* u_out) {
+  u_out->resize(2);
   UpdateWaypoints();
   size_t wp_idx = 1;//0.5*waypoint_vec_local_meter_.size();
   if (waypoint_vec_local_meter_.size()<=wp_idx) {
@@ -37,16 +40,24 @@ void CarModelBicycle::GetControl(std::vector<float>* u_out) {
   }
   Point& wp = waypoint_vec_local_meter_[wp_idx];
   float u_tmp = std::atan2(wp.y, wp.x);
-  float steering_rad = params_.steering_max_deg/(CONSTANTS::RAD2DEG);
-  (*u_out)[1] = std::max(1.*std::min(1.*u_tmp, 1.* steering_rad), -1.* steering_rad);
+  float steering_rad_max = params_.steering_max_deg/(CONSTANTS::RAD2DEG);
+  // set steering angle:
+  (*u_out)[1] = std::max(1.*std::min(1.*u_tmp, 1.* steering_rad_max),
+                        -1.* steering_rad_max);
   last_steering_ = (*u_out)[1];
-  (*u_out)[0] = 0.5*(1-fabs((*u_out)[1])/steering_rad); // 0..1m/s
+  // set force:
+  // too large angle to last waypoint -> deccelarate
+//  float dx = waypoint_vec_local_meter_.back().x - waypoint_vec_local_meter_.front().x;
+//  float dy = waypoint_vec_local_meter_.back().y - waypoint_vec_local_meter_.front().y;
+//  float angle_ratio = fabs(atan2(dy, dx))/steering_rad_max;
+  (*u_out)[0] = 0.03; // [N];
+//  (*u_out)[0] += -0.01*angle_ratio;
 }
 
 // Waypoints should be plotted later on, therefore use member variable
 /*
 ____________________________________________________________________________*/
-bool CarModelBicycle::UpdateWaypoints() {
+bool CarModelBicycleDynamic::UpdateWaypoints() {
   const QImage& grid_local = GetLocalGrid();
   size_t n_cols = grid_local.width();
   size_t n_rows = grid_local.height();
@@ -122,6 +133,6 @@ bool CarModelBicycle::UpdateWaypoints() {
 }
 
 // For display purposes:
-void CarModelBicycle::GetWaypointsPixel(std::vector<Point>* wp_out) const {
+void CarModelBicycleDynamic::GetWaypointsPixel(std::vector<Point>* wp_out) const {
   *wp_out = waypoint_vec_local_pixel_;
 }

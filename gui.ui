@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>664</height>
+    <width>797</width>
+    <height>567</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,29 +25,16 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>571</width>
+      <width>570</width>
       <height>431</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>10</y>
-      <width>89</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Config</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_startpause">
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>50</y>
+      <y>240</y>
       <width>89</width>
       <height>25</height>
      </rect>
@@ -62,8 +49,8 @@
    <widget class="QPushButton" name="pushButton_plot">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>110</y>
+      <x>700</x>
+      <y>270</y>
       <width>89</width>
       <height>25</height>
      </rect>
@@ -75,8 +62,8 @@
    <widget class="QPushButton" name="pushButton_reset">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>80</y>
+      <x>700</x>
+      <y>240</y>
       <width>89</width>
       <height>25</height>
      </rect>
@@ -88,10 +75,10 @@
    <widget class="QGraphicsView" name="graphicsView_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>450</y>
-      <width>191</width>
-      <height>161</height>
+      <x>590</x>
+      <y>10</y>
+      <width>200</width>
+      <height>200</height>
      </rect>
     </property>
    </widget>
@@ -99,7 +86,7 @@
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>140</y>
+      <y>270</y>
       <width>89</width>
       <height>41</height>
      </rect>
@@ -107,6 +94,107 @@
     <property name="text">
      <string>Connect to
 hardware</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="carlistWidget">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>320</y>
+      <width>200</width>
+      <height>91</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_addcar">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>410</y>
+      <width>41</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_remove">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>410</y>
+      <width>61</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Remove</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_params">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>440</y>
+      <width>71</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Params</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="horizontalSlider">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>450</y>
+      <width>570</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_setcurrent">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>470</y>
+      <width>101</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reset history</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_copycar">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>410</y>
+      <width>71</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Duplicate</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_resettoudp">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>470</y>
+      <width>151</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Assign Network State</string>
     </property>
    </widget>
   </widget>

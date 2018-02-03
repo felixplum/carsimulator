@@ -2,29 +2,33 @@
 #define PLOT_WINDOW_H
 
 #include <QWidget>
-#include "../../Libs/qcustomplot/qcustomplot.h"
+#include "qcustomplot/qcustomplot.h"
 #include "state_memory.h"
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/chrono.hpp>
+#include <QGridLayout>
+#include <car.h>
 
 
 class PlotWindow : public QWidget
 {
   Q_OBJECT
 public:
-  explicit PlotWindow(QWidget *parent = nullptr);
-  void Plot();
-  void InitPlot(std::vector<RecordPtr> record_vec);
+  explicit PlotWindow(StateMemory* state_memory, QWidget *parent = nullptr);
+  void AddCurrentStateToGraph();
+  void SetActiveCar(CarPtr car_ptr);
 
 signals:
 
 public slots:
 
 private:
-  QCustomPlot* custom_plot_;
   QGridLayout *layout_;
-  std::vector<RecordPtr> record_vec_;
+  StateMemory* state_memory_;
+  std::vector<QCustomPlot*> plots_;
+  CarPtr car_current_;
+  bool do_rebuild_layout_;
+  //
+  void RebuildLayout();
+  void PlotHistory();
 };
 
 #endif // PLOT_WINDOW_H

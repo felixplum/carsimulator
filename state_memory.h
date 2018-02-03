@@ -11,6 +11,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/chrono.hpp>
 #include <QWidget>
+#include <chrono>
+#include <thread>
 /* This class provides methods for storing and accessing states
    #Usage:
     - Passing ptr to car,  */
@@ -20,8 +22,8 @@
 struct Record {
   enum RecordType {RT_READ_FROM, RT_WRITE_TO};
  private:
-  int state_size_;
-  int state_count_;
+  size_t state_size_;
+  size_t state_count_;
   std::vector<float> time_vec_;
   // stores state vecs. sequentially for faster access
   std::vector<float> state_storage_;
@@ -40,19 +42,29 @@ struct Record {
     time_vec_.push_back(time);
     state_count_++;
   }
+  void ResetToIdx(size_t idx) {
+    boost::mutex::scoped_lock(rw_lock_);
+    if (state_size_ == 0 || idx > state_count_-1) {return;}
+    std::vector<float> tmp_state (state_storage_.begin(),
+          state_storage_.begin()+idx*state_size_+state_size_);
+    state_storage_ = tmp_state;
+    std::vector<float> tmp_time(time_vec_.begin(), time_vec_.begin()+idx+1);
+    time_vec_ = tmp_time;
+    state_count_ = time_vec_.size();
+  }
   bool ReadLastState(std::vector<float>* state_vec_return,
                      float* time_return) const {
     if (state_count_ == 0) {return false;}
     return ReadStateAtIdx(state_vec_return, time_return, state_count_-1);
   }
   bool ReadStateAtIdx(std::vector<float>* state_vec_return,
-                      float* time_return, int state_idx) const {
+                      float* time_return, size_t state_idx) const {
     //std::cout << "ReadStateAtIdx " << state_idx<<std::endl;
     boost::mutex::scoped_lock(rw_lock_);
-    if (state_size_ == 0 || state_idx > state_count_-1) {return false;}
+    if (state_count_ == 0 || state_idx > state_count_-1) {return false;}
     std::vector<float> ret_vec(
           state_storage_.begin()+state_idx*state_size_,
-          state_storage_.begin()+state_idx*state_size_+state_size_); // todo: why not -1?
+          state_storage_.begin()+state_idx*state_size_+state_size_);
 //    std::cout << "read range " << state_idx*state_size_ << " to " << state_idx*state_size_+state_size_-1 << std::endl;
 //    std::cout << "phi rad, ri = " << ret_vec[2] << std::endl;
     *state_vec_return = std::move(ret_vec);
@@ -61,7 +73,7 @@ struct Record {
 //                 " return x = " <<(*state_vec_return)[0]<< std::endl;
     return true;
   }
-  int GetStateCount() const {
+  size_t GetStateCount() const {
     return state_count_;
   }
   void Reset() {
@@ -93,6 +105,7 @@ class StateMemory : QWidget {
   bool RemoveRecordPtr(CarPtr car_ptr);
   void ToggleRecording(bool activate_recording, float dt_sample = 0.1);
   std::vector<RecordPtr> GetRecordPtrVec() const;
+  RecordPtr GetRecord(CarPtr car_ptr) const;
   void ResetState();
 
  private:
@@ -105,6 +118,7 @@ class StateMemory : QWidget {
   std::vector<CarPtr> car_vec_;
   bool is_recording_;
   float dt_sample_;
+  std::unique_ptr<std::thread> thread_;
 
 };
 

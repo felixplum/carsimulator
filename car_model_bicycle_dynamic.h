@@ -1,5 +1,6 @@
-#ifndef CAR_MODEL_BICYCLE_H
-#define CAR_MODEL_BICYCLE_H
+#ifndef CAR_MODEL_BICYCLE_DYNAMIC_H
+#define CAR_MODEL_BICYCLE_DYNAMIC_H
+
 
 #include "car.h"
 #include <iostream>
@@ -7,10 +8,10 @@
 #include <algorithm>
 #include "customtypes.h"
 
-class CarModelBicycle : public Car
+class CarModelBicycleDynamic : public Car
 {
 public:
-    CarModelBicycle(const Map& map_global);
+    CarModelBicycleDynamic(const Map& map_global);
     void EvaluateModel(const std::vector<float>& state_vec,
                 const std::vector<float>& control_input_vec,
                 std::vector<float>* evaluation_vec) const;
@@ -24,4 +25,5 @@ private:
     float last_steering_;
 };
 
-#endif // CAR_MODEL_BICYCLE_H
+
+#endif // CAR_MODEL_BICYCLE_DYNAMIC_H

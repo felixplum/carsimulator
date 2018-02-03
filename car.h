@@ -57,6 +57,9 @@ class CarState {
     float GetTime() const {
       return current_time_;
     }
+    const std::vector<std::string>& GetStateNames() const {
+      return state_names_;
+    }
     const std::vector<float>& GetInputVector() const {
       return input_values_;
     }
@@ -65,6 +68,12 @@ class CarState {
       if (is_init_) assert(state_values_.size() == new_state.size());
       state_values_ = new_state;
       current_time_ += dt;
+    }
+    void SetState(const std::vector<float>& new_state, float time) {
+      boost::mutex::scoped_lock(rw_mutex_);
+//      if (is_init_) assert(state_values_.size() == new_state.size());
+      state_values_ = new_state;
+      current_time_ = time;
     }
     void SetCurrentTime(float t) {
       boost::mutex::scoped_lock(rw_mutex_);
@@ -103,6 +112,32 @@ class CarState {
   }
 };
 
+struct CarParams {
+public:
+  CarParams(){
+    description.push_back("Dist. center of mass <-> rear axis [m]");
+    value_ptrs.push_back(&lr);
+    description.push_back("Dist. center of mass <-> front axis [m]");
+    value_ptrs.push_back(&lf);
+    description.push_back("Car width [m]");
+    value_ptrs.push_back(&width);
+    description.push_back("Mass [kg]");
+    value_ptrs.push_back(&mass);
+    description.push_back("Max. steering angle [deg]");
+    value_ptrs.push_back(&steering_max_deg);
+    description.push_back("Max. velocity [m/s]");
+    value_ptrs.push_back(&v_max);
+  }
+  std::vector<std::string> description;
+  std::vector<float*> value_ptrs;
+  float lr = 0.5*CONSTANTS::CAR_LENGTH_METER;
+  float lf = 0.5*CONSTANTS::CAR_LENGTH_METER;
+  float width = CONSTANTS::CAR_WIDTH_METER;
+  float mass = CONSTANTS::CAR_MASS_KG;
+  float steering_max_deg = 45.;
+  float v_max = 0.7;
+};
+
 // add names for car models here:
 enum CAR_TYPE {CT_BICYCLE};
 
@@ -112,7 +147,7 @@ enum CAR_TYPE {CT_BICYCLE};
 class Car {
   public:
     Car(const Map& map_global);
-
+    CarParams params_;
     CarState& GetCarState();
     void UpdateLocalMap();
     // Performs RK4 integration step and updates state

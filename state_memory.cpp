@@ -12,8 +12,9 @@ _____________________________________________________________________________*/
 void StateMemory::RunRecording() {
   while (is_recording_) {
     // stop simulation, synch? callback/signal
-    boost::this_thread::sleep_for(
-          boost::chrono::milliseconds(static_cast<int>(dt_sample_*1e3)));
+    std::this_thread::sleep_for(
+          std::chrono::milliseconds(static_cast<int>(dt_sample_*1e3)));
+    assert(records_vec_.size() == car_vec_.size());
     for (size_t i = 0; i < car_vec_.size(); ++i) {
       if (records_vec_[i]->record_type_ == Record::RecordType::RT_READ_FROM) {
           continue;
@@ -44,6 +45,7 @@ void StateMemory::AddWriteRecord(CarPtr car) {
 }
 
 bool StateMemory::RemoveRecordPtr(CarPtr car_ptr) {
+  assert(records_vec_.size() == car_vec_.size());
   for (size_t i = 0; i < car_vec_.size(); ++i) {
     if (car_ptr == car_vec_[i]) {
       car_vec_.erase(car_vec_.begin()+i);
@@ -61,9 +63,11 @@ void StateMemory::ToggleRecording(bool activate_recording, float dt_sample) {
   dt_sample_ = dt_sample;
   if (!is_recording_) {
     is_recording_ = true;
-    boost::thread t(&StateMemory::RunRecording, this);
+    if (!thread_)
+      thread_.reset(new std::thread(&StateMemory::RunRecording, this));
   } else if (!activate_recording) {
     is_recording_ = false;
+    if (thread_) {thread_->join(); thread_.reset();}
   }
 }
 
@@ -71,6 +75,15 @@ void StateMemory::ToggleRecording(bool activate_recording, float dt_sample) {
 _____________________________________________________________________________*/
 std::vector<RecordPtr> StateMemory::GetRecordPtrVec() const {
   return records_vec_;
+}
+
+RecordPtr StateMemory::GetRecord(CarPtr car_ptr) const {
+  for (size_t i = 0; i < car_vec_.size(); ++i) {
+    if (car_ptr == car_vec_[i]) {
+      return records_vec_[i];
+    }
+  }
+  return NULL;
 }
 
 /* Delete records, but keep number of records const.

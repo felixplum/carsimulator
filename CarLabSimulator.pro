@@ -1,8 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2017-11-21T16:01:58
-#
-#-------------------------------------------------
 
 QT       += core gui
 
@@ -11,6 +6,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = CarLabSimulator
 TEMPLATE = app
 CONFIG += warn_on
+QMAKE_CXXFLAGS += -std=c++0x
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -24,7 +20,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 LIBS += -lboost_system\
-        -lboost_thread\
+        -pthread\
 
 SOURCES += \
         main.cpp \
@@ -34,8 +30,12 @@ SOURCES += \
     map.cpp \
     simulator.cpp \
     state_memory.cpp \
-    ../../Libs/qcustomplot/qcustomplot.cpp \
-    plot_window.cpp
+    qcustomplot/qcustomplot.cpp \
+    plot_window.cpp \
+    udp_server.cpp \
+    udp_client.cpp \
+    params_window.cpp \
+    car_model_bicycle_dynamic.cpp
 
 HEADERS += \
         gui.h \
@@ -45,8 +45,13 @@ HEADERS += \
     map.h \
     simulator.h \
     state_memory.h \
-    ../../Libs/qcustomplot/qcustomplot.h \
-    plot_window.h
+    qcustomplot/qcustomplot.h \
+    plot_window.h \
+    customtypes.h \
+    udp_server.h \
+    udp_client.h \
+    params_window.h \
+    car_model_bicycle_dynamic.h
 
 FORMS += \
         gui.ui

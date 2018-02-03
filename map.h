@@ -8,6 +8,7 @@
 #include <cmath>
 #include "customtypes.h"
 #include <QMainWindow>
+#include <boost/thread/mutex.hpp>
 
 // storage in grid:
 /* -----------> (cols)
@@ -41,6 +42,7 @@ class Map {
     void GetLocalGrid(const Pose& pose_curr, QImage* local_grid) const;
     float GetPixelPerMeter() const;
     void UnitTest();
+    void SetMap(const QPixmap& pixmap);
   private:
     QImage grid_;
     std::vector<int> occupancy_grid_; // in row major

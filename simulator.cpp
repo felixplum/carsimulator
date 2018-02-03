@@ -5,14 +5,15 @@ Simulator::Simulator(float dt_sample) :
   simulation_run_state_(RS_STOPPED)
 {}
 
+
 /* main thread loop
 ___________________________________________________________________________*/
 void Simulator::Run() {
   while (simulation_run_state_ == RS_RUNNING) {
-    boost::this_thread::sleep_for(
-          boost::chrono::milliseconds(static_cast<int>(dt_sample_*1e3)));
+        std::this_thread::sleep_for(
+          std::chrono::milliseconds(static_cast<int>(dt_sample_*1e3)));
     UpdateCars();
-    //std::cout << "This thread is running lol" << std::endl;
+//    std::cout << "This thread is running lol" << std::endl;
   }
 }
 
@@ -58,8 +59,12 @@ bool Simulator::RemoveCarPtr(CarPtr car_ptr) {
 ____________________________________________________________________________*/
 
 void Simulator::UpdateCars() {
+//  RunState state = simulation_run_state_;
+//  if (state == RS_RUNNING)
+//    ChangeRunStatus(RS_STOPPED);
   for (auto& car_it : simulated_cars_) {
-      std::vector<float> u = {0.5, 0};
+      if (!car_it) continue;
+      std::vector<float> u;
       car_it->GetControl(&u);
       car_it->UpdateState(u, dt_sample_);
       car_it->UpdateLocalMap();
@@ -73,13 +78,14 @@ void Simulator::ChangeRunStatus(RunState new_state) {
   switch(new_state) {
     case RS_RUNNING: {
       simulation_run_state_ = RS_RUNNING;
-      boost::thread t(&Simulator::Run, this);
+      if (!thread_) thread_.reset(new std::thread(&Simulator::Run, this));
       break;
     }
     case RS_PAUSED:
     case RS_STOPPED:
     case RS_READY:
       simulation_run_state_ = new_state;
+      if (thread_) {thread_->join(); thread_.reset();}
       break;
     default: std::cerr << "ChangeRunStatus: Default case.." << std::endl;
   }
@@ -98,27 +104,6 @@ ______________________________________________________________________________
 ______________________________________________________________________________
 _________________ Methods for displaying; todo: give car index _______________*/
 
-
-/* Returns ref. to local grid for first car (use for display!)
-_____________________________________________________________________________ */
-const QImage& Simulator::GetLocalGrid() const {
-  if(simulated_cars_.empty()) {
-    std::cerr << "Cannot return local grid; no cars avaiblable" << std::endl;
-  } else {
-    return (simulated_cars_[0]->GetLocalGrid());
-  }
-// return map_local_;
-}
-
-// For display purposes:
-void Simulator::GetWaypointsPixel(std::vector<Point>* wp_out) const {
-  if(simulated_cars_.empty()) {
-    std::cerr << "Cannot return local waypoints; no cars available" << std::endl;
-  }
-  CarModelBicycle* bm = dynamic_cast<CarModelBicycle*>(simulated_cars_[0].get());
-  bm->GetWaypointsPixel(wp_out);
-
-}
 
 
 // SetSampleTime()

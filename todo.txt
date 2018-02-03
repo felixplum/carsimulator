@@ -15,24 +15,33 @@
   Put plot window in own class, tried to figure out how to replot data (HOW???)
 12.12: 
   Implemented QTimer + Signal/Slot mechanism
-    [] time and state seem to diverge!?
+    [x] time and state seem to diverge!?
+17.12:
+  Added coordinate transform car--view
+  Added basic drawing routine for car
 
-Next steps: 
+9.1:
+  Loading and displaying of bitmaps works now
 
-  []Add drawing routine (rectangle)
-  []Add draw from StateMemory
-  []ReadFromFile (get log output on RCL computer first)
-  []Display Gridmap
-  []Get coordinate systems right
-  []Sample from local map
-  []Add controller to car_bicyle_model
-  []Add path generator
-  []Pass map object to car
+  Days worked: 11 Left: 14
 
 
-____-
+10.-23.1:
+  Egoview, Pathplanner, Controller
+
+todo:
+
+  - create simple udp-server with boost::asio
+  - define simple protocol for sending a set of floats
+  - create mock-server that generates test data, receive with client
+  - setup sim. to listen to data packets (data logger, visualisation)
+  - put server classes on RCL hardware, connect with state observer
+
+  simple udp server: https://gist.github.com/kaimallea/e112f5c22fe8ca6dc627
+  asio tutorial: http://www.boost.org/doc/libs/1_64_0/doc/html/boost_asio/tutorial.html
+
+estimated effort: 10 days
 
 
-) QT_GRAPHICSSYSTEM=xxxx. I tried the various 'native', 'raster', 'opengl' settings. On Linux the 'raster' was the best performer. The CPU utilization dropped to about 15% in my test. On windows 'opengl' just caused a blank window screen to appear.... 'raster' was the fastest.
+__
 
-https://mayaposch.wordpress.com/2011/11/01/how-to-really-truly-use-qthreads-the-full-explanation/

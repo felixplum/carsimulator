@@ -62,6 +62,7 @@ void Car::AddVectors(float scale1, const std::vector<float>& v1,
 ______________________________________________________________________________*/
 void Car::UpdateLocalMap() {
   std::vector<float> state_vec = GetCarState().GetStateVector();
+  if (state_vec.size()<3) return;
   map_global_.GetLocalGrid(Pose(state_vec[0], state_vec[1], state_vec[2]),
                            &map_local_);
 }

@@ -15,16 +15,17 @@
 
 void RunServer() {
   UDPServer server;
-  std::vector<float> state(4, 0);
+  std::vector<float> state(5, 0);
   float t = 0.;
   float dt = 0.1;
   while(1) {
     boost::this_thread::sleep_for(
             boost::chrono::milliseconds(static_cast<int>(dt*1e3)));
-    state[0] = fmod((t*0.3), 3.); // 0..3 0..3 ...
-    state[1] = fmod(0.666*state[0], 2.);
-    state[2] = 30.*3.141/180.;
-    state[3] = t;
+    state[0] = 0.;
+    state[2] = fmod((t*0.3), 3.); // 0..3 0..3 ...
+    state[3] = fmod(0.666*state[2], 2.);
+    state[4] = 30.*3.141/180.;
+    state[1] = t;
     t += dt;
     server.SendState(state);
 //    std::cout << state[0]  << std::endl;

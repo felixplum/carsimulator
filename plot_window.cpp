@@ -1,27 +1,88 @@
 #include "plot_window.h"
 
-PlotWindow::PlotWindow(QWidget *parent) : QWidget(parent) {
-
-  custom_plot_ = new QCustomPlot(this);
+PlotWindow::PlotWindow(StateMemory* state_memory,
+                       QWidget *parent) : QWidget(parent) {
+  car_current_ = NULL;
+  state_memory_ = state_memory;
+  do_rebuild_layout_ = false;
   layout_ = new QGridLayout(this);
-  layout_->addWidget(custom_plot_, 0, 0);
-  //plot_window_->setLayout(layout);
-  custom_plot_->addGraph();
-  custom_plot_->graph(0)->setLineStyle(QCPGraph::lsLine);
-  custom_plot_->addGraph();
-  custom_plot_->graph(1)->setLineStyle(QCPGraph::lsLine);
+
   this->move(300, 300);
-  this->resize(200, 200);
-  record_vec_.resize(0);
+  this->resize(300, 700);
 }
 
+void PlotWindow::RebuildLayout() {
+  if (!car_current_) return;
+  for (auto &it : plots_) {
+    delete it;
+  }
+  plots_.clear();
 
-void PlotWindow::InitPlot(std::vector<RecordPtr> record_vec) {
-  record_vec_ = record_vec;
+  const std::vector<std::string>& state_names =
+      car_current_->GetCarState().GetStateNames();
+
+  for (size_t i = 0; i < state_names.size(); ++i) {
+    plots_.push_back(new QCustomPlot(this));
+    layout_->addWidget(plots_[i], i, 0);
+    plots_[i]->addGraph(0);
+    plots_[i]->graph(0)->setLineStyle(QCPGraph::lsLine);
+    plots_[i]->yAxis->setLabel(QString::fromStdString(state_names[i]));
+    plots_[i]->yAxis->setNumberPrecision(1);
+    if (i == state_names.size()-1) {
+        plots_[i]->xAxis->setLabel("t [s]");
+        plots_[i]->xAxis->setNumberPrecision(1);
+    }
+  }
+  PlotHistory();
 }
 
-void PlotWindow::Plot() {
+void PlotWindow::SetActiveCar(CarPtr car_ptr) {
+  if (car_current_ != car_ptr) {
+    car_current_ = car_ptr;
+    do_rebuild_layout_ = true;
+  } else {do_rebuild_layout_ = false;}
+}
 
+void PlotWindow::PlotHistory() {
+  if (!car_current_) return;
+  RecordPtr record = state_memory_->GetRecord(car_current_);
+  size_t skip_val = (record->GetStateCount())/100 + 1;
+  for (size_t i = 0; i < record->GetStateCount(); i+=skip_val) {
+    std::vector<float> state;
+    float time;
+    record->ReadStateAtIdx(&state, &time, i);
+    for (size_t i = 0; i < plots_.size(); ++i) {
+      // add state; map angle to 0..2*PI
+      if (car_current_->GetCarState().GetStateNames()[i] == "phi") {
+        plots_[i]->graph(0)->addData(time, fmod(state[i], 2*3.141));
+      } else {
+        plots_[i]->graph(0)->addData(time, state[i]);
+      }
+      plots_[i]->graph(0)->rescaleAxes();
+      plots_[i]->replot();
+    }
+  }
+}
+
+void PlotWindow::AddCurrentStateToGraph() {
+  if (!car_current_) return;
+  if (do_rebuild_layout_) {
+    RebuildLayout();
+    do_rebuild_layout_ = false;
+  }
+  const std::vector<float>& state = car_current_->GetCarState().GetStateVector();
+  float time =  car_current_->GetCarState().GetTime();
+  for (size_t i = 0; i < plots_.size(); ++i) {
+    // add state; map angle to 0..2*PI
+    if (car_current_->GetCarState().GetStateNames()[i] == "phi") {
+      plots_[i]->graph(0)->addData(time, fmod(state[i], 2*3.141));
+    } else {
+      plots_[i]->graph(0)->addData(time, state[i]);
+    }
+    plots_[i]->graph(0)->rescaleAxes();
+    plots_[i]->replot();
+  }
+/*
   std::vector<float> state_vec_return;
   float time_return;
   if (record_vec_.empty()) return;
@@ -51,5 +112,6 @@ void PlotWindow::Plot() {
 //  custom_plot_->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 5));
   custom_plot_->replot();
   //custom_plot_->show();
+  */
 }
 

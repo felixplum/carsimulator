@@ -16,6 +16,8 @@ class UDPServer
 public:
   UDPServer();
   void SendState(const std::vector<float> &state);
+  void SendHandler(const boost::system::error_code &error,
+                   size_t bytes_transferred);
 private:
   int port_number_;
   ba::io_service io_;
